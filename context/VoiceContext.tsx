@@ -212,6 +212,7 @@ interface VoiceContextType {
   pause: () => void;
   resume: () => void;
   stop: () => void;
+  getAnalyser: () => AnalyserNode | null;
 }
 
 const VoiceContext = createContext<VoiceContextType | undefined>(undefined);
@@ -556,6 +557,10 @@ export function VoiceProvider({
     }
   };
 
+  const getAnalyser = () => {
+    return playerRef.current.getAnalyser();
+  };
+
   return (
     <VoiceContext.Provider
       value={{
@@ -567,6 +572,7 @@ export function VoiceProvider({
         pause,
         resume,
         stop,
+        getAnalyser,
       }}
     >
       {children}

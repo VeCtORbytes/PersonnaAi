@@ -94,7 +94,7 @@ export function DebatePanel({
               )}
             >
               {msg.role === "user" ? (
-                <span>"{msg.content}"</span>
+                <span>&ldquo;{msg.content}&rdquo;</span>
               ) : (
                 <ReactMarkdown
                   components={{

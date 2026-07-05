@@ -18,15 +18,6 @@ export function useDebate() {
   const [streamingPiyush, setStreamingPiyush] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const getHistory = (persona: PersonaId): Message[] =>
-    messages
-      .filter((m) => m.role === "user" || m.persona === persona)
-      .map((m) => ({
-        id: m.id,
-        role: m.role,
-        content: m.content,
-        timestamp: m.timestamp,
-      }));
 
   const streamPersona = async (
     persona: PersonaId,
@@ -73,6 +64,16 @@ export function useDebate() {
       setIsLoading(true);
       setStreamingHitesh("");
       setStreamingPiyush("");
+
+      const getHistory = (persona: PersonaId): Message[] =>
+        messages
+          .filter((m) => m.role === "user" || m.persona === persona)
+          .map((m) => ({
+            id: m.id,
+            role: m.role,
+            content: m.content,
+            timestamp: m.timestamp,
+          }));
 
       const hiteshHistory = getHistory("hitesh");
       const piyushHistory = getHistory("piyush");
