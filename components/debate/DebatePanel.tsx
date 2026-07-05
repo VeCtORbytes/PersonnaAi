@@ -111,7 +111,7 @@ export function DebatePanel({
                 "text-sm rounded-xl px-4 py-3",
                 msg.role === "user"
                   ? "bg-muted text-muted-foreground italic text-xs"
-                  : "bg-background/80 text-foreground"
+                  : "bg-background text-foreground"
               )}
             >
               {msg.role === "user" ? (
@@ -156,7 +156,7 @@ export function DebatePanel({
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-sm rounded-xl px-4 py-3 bg-background/80 text-foreground"
+              className="text-sm rounded-xl px-4 py-3 bg-background text-foreground"
             >
               <ReactMarkdown>{streamingContent}</ReactMarkdown>
             </motion.div>

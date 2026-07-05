@@ -8,11 +8,17 @@ import { TypingIndicator } from "./TypingIndicator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { generateId } from "../../utils/helpers";
 
+import { getPersona } from "@/data/personas/registry";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { TopicSuggestions } from "./TopicSuggestions";
+
 interface Props {
   messages: Message[];
   activePersona: PersonaId;
   isLoading: boolean;
   streamingContent: string;
+  onSelectSuggestion?: (s: string) => void;
 }
 
 export function MessageList({
@@ -20,8 +26,10 @@ export function MessageList({
   activePersona,
   isLoading,
   streamingContent,
+  onSelectSuggestion,
 }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null);
+  const personaConfig = getPersona(activePersona);
 
   useEffect(() => {
     const viewport = bottomRef.current?.closest('[data-slot="scroll-area-viewport"]');
@@ -41,22 +49,44 @@ export function MessageList({
 
   return (
     <ScrollArea className="flex-1 min-h-0">
-      <div className="py-4">
+      <div className="py-4 h-full">
         {isEmpty && (
-          <div className="flex flex-col items-center justify-center h-full py-24 text-center text-muted-foreground">
-            <div className="text-4xl mb-4">
-              {activePersona === "hitesh" ? "🍵" : "⚡"}
+          <div className="flex flex-col items-center justify-center min-h-[80%] py-12 text-center text-muted-foreground">
+            {/* Flat Solid Avatar Border */}
+            <div
+              className="relative w-24 h-24 rounded-full overflow-hidden border-3 mb-4 shadow-xs"
+              style={{
+                borderColor: activePersona === "hitesh" ? "#D4A76A" : "#7C3AED",
+              }}
+            >
+              <Image
+                src={personaConfig.avatar}
+                alt={personaConfig.name}
+                fill
+                sizes="96px"
+                className="object-cover"
+              />
             </div>
-            <p className="text-lg font-medium">
-              {activePersona === "hitesh"
-                ? "Chai peete hain aur poochte hain!"
-                : "Seedha question puchho."}
+
+            <h2 className="text-xl font-extrabold text-foreground mb-1">
+              {personaConfig.name}
+            </h2>
+            <p className="text-xs font-semibold px-2 py-0.5 rounded-full border mb-4 bg-muted/30 border-border">
+              {activePersona === "hitesh" ? "🍵 Chai aur Code" : "⚡ Systems First"}
             </p>
-            <p className="text-sm mt-1 opacity-70">
-              {activePersona === "hitesh"
-                ? "Ask Hitesh anything about JavaScript, React, or career advice."
-                : "Ask Piyush about systems, architecture, or production engineering."}
+            <p className="text-sm text-muted-foreground max-w-md px-6 mb-8 leading-relaxed italic">
+              &ldquo;{personaConfig.tagline}&rdquo;
             </p>
+
+            {/* Suggestions centered */}
+            {onSelectSuggestion && (
+              <TopicSuggestions
+                persona={activePersona}
+                onSelect={onSelectSuggestion}
+                visible={true}
+                centered={true}
+              />
+            )}
           </div>
         )}
 

@@ -3,7 +3,6 @@
 import type { PersonaId } from "@/types";
 import { getAllPersonas } from "@/data/personas/registry";
 import { cn } from "../../utils/helpers";
-import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 
 interface Props {
@@ -16,9 +15,13 @@ const personas = getAllPersonas();
 
 export function PersonaSelector({ active, onSwitch, disabled }: Props) {
   return (
-    <div className="flex gap-3 p-4 border-b border-border">
+    <div className="flex items-center bg-muted/60 p-0.5 rounded-lg border border-border/50 w-full h-8">
       {personas.map((persona) => {
         const isActive = persona.id === active;
+        const activeColor =
+          persona.id === "hitesh"
+            ? "bg-[#D4A76A] text-black shadow-xs font-bold"
+            : "bg-[#7C3AED] text-white shadow-xs font-bold";
         return (
           <button
             key={persona.id}
@@ -26,33 +29,23 @@ export function PersonaSelector({ active, onSwitch, disabled }: Props) {
             disabled={disabled}
             aria-label={`Switch to ${persona.name}`}
             className={cn(
-              "flex items-center gap-3 px-4 py-2.5 rounded-xl border text-sm font-medium transition-all duration-200",
+              "flex-1 flex items-center justify-center gap-1.5 h-full rounded-md text-[11px] font-medium transition-all duration-200 cursor-pointer select-none",
               isActive
-                ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                : "bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-foreground",
+                ? activeColor
+                : "text-muted-foreground hover:text-foreground hover:bg-background/20",
               disabled && "opacity-50 cursor-not-allowed"
             )}
           >
-            <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 border border-border/40">
+            <div className="w-3.5 h-3.5 rounded-full overflow-hidden flex-shrink-0 border border-black/10 dark:border-white/10 relative">
               <Image
                 src={persona.avatar}
                 alt={persona.name}
-                width={24}
-                height={24}
-                className="w-full h-full object-cover"
+                fill
+                sizes="14px"
+                className="object-cover"
               />
             </div>
-            <div className="text-left">
-              <div className="font-semibold leading-tight">{persona.name}</div>
-              <div className="text-xs opacity-70 leading-tight">
-                {persona.tagline.slice(0, 32)}...
-              </div>
-            </div>
-            {isActive && (
-              <Badge variant="secondary" className="ml-1 text-xs">
-                Active
-              </Badge>
-            )}
+            <span>{persona.id === "hitesh" ? "Hitesh" : "Piyush"}</span>
           </button>
         );
       })}

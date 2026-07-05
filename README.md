@@ -1,14 +1,14 @@
-# Persona AI
+# BrewedMinds
 
 > AI-powered conversations with India's top tech educators — Hitesh Choudhary and Piyush Garg.
 
-🔗 **Live Demo**: https://personna-ai.vercel.app
+🔗 **Live Demo**: https://brewedminds.vercel.app
 
 ---
 
 ## What is this?
 
-Persona AI simulates deep, believable conversations with two of India's most well-known software engineering educators. This isn't a simple `system: "You are Hitesh"` chatbot. Each persona is built from structured behavioral data — teaching philosophy, communication style, Hinglish patterns, favorite phrases, humor fingerprints, and few-shot conversation examples — assembled dynamically into a prompt pipeline at runtime.
+BrewedMinds simulates deep, believable conversations with two of India's most well-known software engineering educators. This isn't a simple `system: "You are Hitesh"` chatbot. Each persona is built from structured behavioral data — teaching philosophy, communication style, Hinglish patterns, favorite phrases, humor fingerprints, and few-shot conversation examples — assembled dynamically into a prompt pipeline at runtime.
 
 ---
 

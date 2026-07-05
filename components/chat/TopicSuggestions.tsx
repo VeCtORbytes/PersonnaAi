@@ -24,23 +24,29 @@ interface Props {
   persona: PersonaId;
   onSelect: (suggestion: string) => void;
   visible: boolean;
+  centered?: boolean;
 }
 
-export function TopicSuggestions({ persona, onSelect, visible }: Props) {
+export function TopicSuggestions({
+  persona,
+  onSelect,
+  visible,
+  centered = false,
+}: Props) {
   if (!visible) return null;
 
   return (
-    <div className="px-4 pb-3">
-      <p className="text-xs text-muted-foreground mb-2">
+    <div className={cn("px-4 pb-3", centered && "flex flex-col items-center text-center")}>
+      <p className="text-xs text-muted-foreground mb-2.5">
         💡 Suggested topics
       </p>
-      <div className="flex flex-wrap gap-2">
+      <div className={cn("flex flex-wrap gap-2", centered && "justify-center max-w-xl")}>
         {SUGGESTIONS[persona].map((s) => (
           <button
             key={s}
             onClick={() => onSelect(s)}
             className={cn(
-              "text-xs px-3 py-1.5 rounded-full border transition-all",
+              "text-xs px-3.5 py-1.5 rounded-full border transition-all cursor-pointer select-none",
               "border-[var(--persona-border)] text-muted-foreground",
               "hover:bg-[var(--persona-bubble)] hover:text-foreground",
               "hover:border-[var(--persona-accent)]"

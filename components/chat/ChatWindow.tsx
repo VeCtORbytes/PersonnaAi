@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { useThreads } from "@/hooks/useThreads";
 import { PersonaSelector } from "@/components/persona/PersonaSelector";
@@ -13,11 +13,24 @@ import { DebateModeToggle } from "@/components/debate/DebateModeToggle";
 import { Sidebar } from "@/components/sidebar/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
-import { useState } from "react";
 import { CommandPalette } from "@/components/ui/CommandPalette";
+import { HexagonPattern } from "@/components/ui/HexagonPattern";
+import Link from "next/link";
+import type { PersonaId } from "@/types";
+import { Logo } from "@/components/ui/Logo";
 
-export function ChatWindow() {
-  const [debateMode, setDebateMode] = useState(false);
+interface ChatWindowProps {
+  initialPersona?: PersonaId;
+  initialDebateMode?: boolean;
+  initialVoice?: boolean;
+}
+
+export function ChatWindow({
+  initialPersona,
+  initialDebateMode = false,
+  initialVoice = false,
+}: ChatWindowProps) {
+  const [debateMode, setDebateMode] = useState(initialDebateMode);
   const [shortcutText, setShortcutText] = useState("⌘K");
 
   useEffect(() => {
@@ -25,10 +38,7 @@ export function ChatWindow() {
       typeof window !== "undefined" &&
       !/Mac|iPad|iPhone|iPod/.test(navigator.userAgent)
     ) {
-      const handle = setTimeout(() => {
-        setShortcutText("Ctrl+K");
-      }, 0);
-      return () => clearTimeout(handle);
+      setShortcutText("Ctrl+K");
     }
   }, []);
 
@@ -48,6 +58,43 @@ export function ChatWindow() {
     newThread,
     clearThread,
   } = useThreads();
+
+  const isInitialPersonaApplied = useRef(false);
+
+  // Override active persona on mount if initialPersona search param is provided
+  useEffect(() => {
+    if (initialPersona && !isInitialPersonaApplied.current) {
+      isInitialPersonaApplied.current = true;
+      if (initialPersona !== activePersona) {
+        const handle = setTimeout(() => {
+          switchPersona(initialPersona);
+        }, 60);
+        return () => clearTimeout(handle);
+      }
+    }
+  }, [initialPersona, switchPersona, activePersona]);
+
+  // Synchronize active state changes back to URL query parameters
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (debateMode) {
+        if (url.searchParams.get("mode") !== "debate") {
+          url.searchParams.set("mode", "debate");
+          url.searchParams.delete("persona");
+          window.history.replaceState(null, "", url.pathname + url.search + url.hash);
+        }
+      } else {
+        const currentPersonaInUrl = url.searchParams.get("persona");
+        const currentModeInUrl = url.searchParams.get("mode");
+        if (currentModeInUrl === "debate" || currentPersonaInUrl !== activePersona) {
+          url.searchParams.delete("mode");
+          url.searchParams.set("persona", activePersona);
+          window.history.replaceState(null, "", url.pathname + url.search + url.hash);
+        }
+      }
+    }
+  }, [activePersona, debateMode]);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-persona", activePersona);
@@ -76,6 +123,9 @@ export function ChatWindow() {
         <DebateWindow onExit={() => setDebateMode(false)} />
       ) : (
         <div className="flex h-screen bg-background overflow-hidden relative">
+          {/* Honeycomb Pattern */}
+          <HexagonPattern />
+
           {/* Sidebar */}
           <Sidebar
             threads={threads}
@@ -92,16 +142,31 @@ export function ChatWindow() {
           />
 
           {/* Main chat area */}
-          <div className="flex flex-col flex-1 min-w-0">
+          <div className="flex flex-col flex-1 min-w-0 relative z-10 bg-background">
             {/* Header */}
-            <header className="flex items-center justify-between px-4 py-3 border-b border-border pl-12">
-              <div>
-                <h1 className="text-lg font-bold tracking-tight">Persona AI</h1>
-                <p className="text-xs text-muted-foreground hidden sm:block">
-                  Chat with your favourite tech educators
-                </p>
+            <header className="flex items-center justify-between px-4 py-2 border-b border-border pl-12 bg-background">
+              <Link href="/" className="flex items-center gap-2 group">
+                <Logo size={22} className="group-hover:rotate-6 transition-transform duration-300" />
+                <div className="flex flex-col">
+                  <span className="text-sm font-extrabold tracking-tight text-foreground leading-none">
+                    BrewedMinds
+                  </span>
+                  <span className="text-[9px] text-muted-foreground hidden sm:inline-block leading-none mt-0.5">
+                    ChaiCode Cohort
+                  </span>
+                </div>
+              </Link>
+
+              {/* Compact Persona Tab Selector in Header */}
+              <div className="flex-1 max-w-[200px] mx-4">
+                <PersonaSelector
+                  active={activePersona}
+                  onSwitch={switchPersona}
+                  disabled={isLoading}
+                />
               </div>
-              <div className="flex items-center gap-2">
+
+              <div className="flex items-center gap-1.5">
                 <kbd className="hidden md:inline-flex h-6 select-none items-center gap-1.5 rounded border border-border bg-muted/50 px-2 font-mono text-[9px] font-medium text-muted-foreground select-none">
                   {shortcutText}
                 </kbd>
@@ -119,30 +184,22 @@ export function ChatWindow() {
               </div>
             </header>
 
-            {/* Persona selector */}
-            <PersonaSelector
-              active={activePersona}
-              onSwitch={switchPersona}
-              disabled={isLoading}
-            />
-
-            {/* Messages */}
+            {/* Messages Area */}
             <MessageList
               messages={messages}
               activePersona={activePersona}
               isLoading={isLoading}
               streamingContent={streamingContent}
-            />
-
-            {/* Topic suggestions */}
-            <TopicSuggestions
-              persona={activePersona}
-              onSelect={handleSend}
-              visible={messages.length === 0 && !isLoading}
+              onSelectSuggestion={handleSend}
             />
 
             {/* Input */}
             <MessageInput onSend={handleSend} disabled={isLoading} />
+
+            {/* Footer attribution */}
+            <footer className="text-[10px] text-muted-foreground/60 py-1.5 text-center border-t border-border-subtle bg-background/40 backdrop-blur-xs select-none">
+              Built by Sarthak Gupta · ChaiCode GenAI Cohort
+            </footer>
           </div>
         </div>
       )}
