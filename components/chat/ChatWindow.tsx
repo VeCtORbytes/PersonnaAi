@@ -18,6 +18,7 @@ import { HexagonPattern } from "@/components/ui/HexagonPattern";
 import Link from "next/link";
 import type { PersonaId } from "@/types";
 import { Logo } from "@/components/ui/Logo";
+import { Show, UserButton } from "@clerk/nextjs";
 
 interface ChatWindowProps {
   initialPersona?: PersonaId;
@@ -172,6 +173,9 @@ export function ChatWindow({
                 </kbd>
                 <DebateModeToggle onClick={() => setDebateMode(true)} />
                 <ThemeToggle />
+                <Show when="signed-in">
+                  <UserButton />
+                </Show>
                 <Button
                   variant="ghost"
                   size="icon"

@@ -12,6 +12,12 @@ import { Badge } from "@/components/ui/badge";
 import { Swords, Mic, Sparkles, Terminal, Keyboard } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "@/components/ui/Logo";
+import {
+  SignInButton,
+  SignUpButton,
+  Show,
+  UserButton,
+} from "@clerk/nextjs";
 
 export function LandingPage() {
   const router = useRouter();
@@ -91,6 +97,21 @@ export function LandingPage() {
             </kbd>
           </button>
           <ThemeToggle />
+          <Show when="signed-out">
+            <SignInButton mode="redirect" fallbackRedirectUrl="/chat">
+              <button className="text-sm font-medium px-3 py-1.5 rounded-lg border border-border hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors">
+                Sign In
+              </button>
+            </SignInButton>
+            <SignUpButton mode="redirect" fallbackRedirectUrl="/chat">
+              <button className="text-sm font-semibold px-3 py-1.5 rounded-lg bg-[#D4A76A] hover:bg-[#C4955A] text-black transition-colors">
+                Sign Up
+              </button>
+            </SignUpButton>
+          </Show>
+          <Show when="signed-in">
+            <UserButton />
+          </Show>
         </div>
       </header>
 
