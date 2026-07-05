@@ -18,6 +18,56 @@ export function Logo({ className, size = 28 }: LogoProps) {
       xmlns="http://www.w3.org/2000/svg"
       className={cn("flex-shrink-0 select-none", className)}
     >
+      <style>{`
+        @keyframes steam-drift {
+          0%, 100% {
+            transform: translateY(0) scaleY(1);
+            opacity: 0.6;
+          }
+          50% {
+            transform: translateY(-3px) scaleY(1.08);
+            opacity: 0.95;
+          }
+        }
+        @keyframes node-glow {
+          0%, 100% {
+            r: 4.5;
+            filter: drop-shadow(0 0 1px rgba(124, 58, 237, 0.4));
+          }
+          50% {
+            r: 5.5;
+            filter: drop-shadow(0 0 3px rgba(124, 58, 237, 0.8));
+          }
+        }
+        @keyframes node-glow-amber {
+          0%, 100% {
+            r: 3.5;
+            filter: drop-shadow(0 0 1px rgba(212, 167, 106, 0.4));
+          }
+          50% {
+            r: 4.2;
+            filter: drop-shadow(0 0 3px rgba(212, 167, 106, 0.8));
+          }
+        }
+        .logo-steam-1 {
+          animation: steam-drift 3.5s ease-in-out infinite;
+          transform-origin: 50px 32px;
+        }
+        .logo-steam-2 {
+          animation: steam-drift 2.8s ease-in-out infinite 0.6s;
+          transform-origin: 50px 32px;
+        }
+        .logo-node-violet {
+          animation: node-glow 3s ease-in-out infinite;
+        }
+        .logo-node-amber-1 {
+          animation: node-glow-amber 3.5s ease-in-out infinite 0.4s;
+        }
+        .logo-node-amber-2 {
+          animation: node-glow-amber 3.5s ease-in-out infinite 0.8s;
+        }
+      `}</style>
+
       {/* Main Cup Body (The Brew) */}
       <path
         d="M28 42 C28 65, 34 76, 50 76 C66 76, 72 65, 72 42 Z"
@@ -50,7 +100,7 @@ export function Logo({ className, size = 28 }: LogoProps) {
         strokeWidth="4.5"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="opacity-90"
+        className="logo-steam-1"
       />
 
       {/* Neural Steam Line 2 (Inside loop) */}
@@ -60,13 +110,13 @@ export function Logo({ className, size = 28 }: LogoProps) {
         strokeWidth="3.5"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="opacity-75"
+        className="logo-steam-2"
       />
 
       {/* Network Nodes (The Minds) */}
-      <circle cx="50" cy="12" r="4.5" fill="#7C3AED" />
-      <circle cx="38" cy="32" r="3.5" fill="#D4A76A" />
-      <circle cx="62" cy="32" r="3.5" fill="#D4A76A" />
+      <circle cx="50" cy="12" r="4.5" fill="#7C3AED" className="logo-node-violet" />
+      <circle cx="38" cy="32" r="3.5" fill="#D4A76A" className="logo-node-amber-1" />
+      <circle cx="62" cy="32" r="3.5" fill="#D4A76A" className="logo-node-amber-2" />
     </svg>
   );
 }
