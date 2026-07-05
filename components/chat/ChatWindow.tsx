@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useChat } from "@/hooks/useChat";
 import { PersonaSelector } from "@/components/persona/PersonaSelector";
@@ -8,10 +8,14 @@ import { MessageList } from "@/components/chat/MessageList";
 import { MessageInput } from "@/components/chat/MessageInput";
 import { TopicSuggestions } from "@/components/chat/TopicSuggestions";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { DebateWindow } from "@/components/debate/DebateWindow";
+import { DebateModeToggle } from "@/components/debate/DebateModeToggle";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 
 export function ChatWindow() {
+  const [debateMode, setDebateMode] = useState(false);
+
   const {
     messages,
     activePersona,
@@ -36,6 +40,11 @@ export function ChatWindow() {
     sendMessage(msg);
   };
 
+  // Debate mode takes over full screen
+  if (debateMode) {
+    return <DebateWindow onExit={() => setDebateMode(false)} />;
+  }
+
   return (
     <div className="flex flex-col h-screen bg-background transition-colors duration-300">
       {/* Header */}
@@ -46,7 +55,8 @@ export function ChatWindow() {
             Chat with your favourite tech educators
           </p>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
+          <DebateModeToggle onClick={() => setDebateMode(true)} />
           <ThemeToggle />
           <Button
             variant="ghost"

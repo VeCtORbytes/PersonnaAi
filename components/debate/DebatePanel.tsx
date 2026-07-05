@@ -1,0 +1,150 @@
+"use client";
+
+import { motion } from "framer-motion";
+import ReactMarkdown from "react-markdown";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { TypingIndicator } from "@/components/chat/TypingIndicator";
+import type { PersonaId } from "@/types";
+import type { DebateMessage } from "@/hooks/useDebate";
+import { cn } from "@/utils/helpers";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useEffect, useRef } from "react";
+
+interface Props {
+  persona: PersonaId;
+  messages: DebateMessage[];
+  streamingContent: string;
+  isLoading: boolean;
+}
+
+const PERSONA_META = {
+  hitesh: {
+    emoji: "🍵",
+    name: "Hitesh Choudhary",
+    accent: "border-amber-500/30 bg-amber-500/5",
+    header: "bg-amber-500/10 border-amber-500/20",
+    badge: "text-amber-600 dark:text-amber-400",
+  },
+  piyush: {
+    emoji: "⚡",
+    name: "Piyush Garg",
+    accent: "border-violet-500/30 bg-violet-500/5",
+    header: "bg-violet-500/10 border-violet-500/20",
+    badge: "text-violet-600 dark:text-violet-400",
+  },
+};
+
+export function DebatePanel({
+  persona,
+  messages,
+  streamingContent,
+  isLoading,
+}: Props) {
+  const meta = PERSONA_META[persona];
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  const panelMessages = messages.filter(
+    (m) => m.role === "user" || m.persona === persona
+  );
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [panelMessages, streamingContent, isLoading]);
+
+  return (
+    <div
+      className={cn(
+        "flex flex-col flex-1 border rounded-2xl overflow-hidden",
+        meta.accent
+      )}
+    >
+      {/* Panel header */}
+      <div
+        className={cn(
+          "flex items-center gap-2 px-4 py-3 border-b",
+          meta.header
+        )}
+      >
+        <span className="text-xl">{meta.emoji}</span>
+        <div>
+          <p className={cn("text-sm font-semibold", meta.badge)}>
+            {meta.name}
+          </p>
+          {isLoading && (
+            <p className="text-xs text-muted-foreground">responding...</p>
+          )}
+        </div>
+      </div>
+
+      {/* Messages */}
+      <ScrollArea className="flex-1 p-4">
+        <div className="space-y-4">
+          {panelMessages.map((msg) => (
+            <motion.div
+              key={msg.id}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+              className={cn(
+                "text-sm rounded-xl px-4 py-3",
+                msg.role === "user"
+                  ? "bg-muted text-muted-foreground italic text-xs"
+                  : "bg-background/80 text-foreground"
+              )}
+            >
+              {msg.role === "user" ? (
+                <span>"{msg.content}"</span>
+              ) : (
+                <ReactMarkdown
+                  components={{
+                    code({ className, children }) {
+                      const match = /language-(\w+)/.exec(className || "");
+                      return match ? (
+                        <SyntaxHighlighter
+                          style={oneDark}
+                          language={match[1]}
+                          PreTag="div"
+                          className="rounded-lg !my-2 !text-xs"
+                        >
+                          {String(children).replace(/\n$/, "")}
+                        </SyntaxHighlighter>
+                      ) : (
+                        <code className="bg-black/20 rounded px-1 py-0.5 text-xs font-mono">
+                          {children}
+                        </code>
+                      );
+                    },
+                    p({ children }) {
+                      return (
+                        <p className="mb-2 last:mb-0 leading-relaxed">
+                          {children}
+                        </p>
+                      );
+                    },
+                  }}
+                >
+                  {msg.content}
+                </ReactMarkdown>
+              )}
+            </motion.div>
+          ))}
+
+          {/* Streaming */}
+          {isLoading && streamingContent && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-sm rounded-xl px-4 py-3 bg-background/80 text-foreground"
+            >
+              <ReactMarkdown>{streamingContent}</ReactMarkdown>
+            </motion.div>
+          )}
+
+          {isLoading && !streamingContent && <TypingIndicator />}
+          <div ref={bottomRef} />
+        </div>
+      </ScrollArea>
+    </div>
+  );
+}
