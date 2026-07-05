@@ -116,7 +116,20 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
+/* Persona themes */
+[data-persona="hitesh"] {
+  --persona-accent: #D4A76A;
+  --persona-accent-hover: #C4955A;
+  --persona-bubble: rgba(212, 167, 106, 0.1);
+  --persona-border: rgba(212, 167, 106, 0.3);
+}
 
+[data-persona="piyush"] {
+  --persona-accent: #7C3AED;
+  --persona-accent-hover: #6D28D9;
+  --persona-bubble: rgba(124, 58, 237, 0.1);
+  --persona-border: rgba(124, 58, 237, 0.3);
+}
 @layer base {
   * {
     @apply border-border outline-ring/50;

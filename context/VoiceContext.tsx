@@ -8,6 +8,7 @@ import { splitTextIntoSentences } from "../lib/voice/pipeline/splitter";
 import { getCachedAudio, storeCachedAudio } from "../lib/voice/pipeline/cache";
 import { PlaybackQueue } from "../lib/voice/pipeline/queue";
 import { AudioPlayer } from "../lib/voice/pipeline/player";
+import { toast } from "sonner";
 
 export type PlaybackState =
   | "idle"
@@ -395,7 +396,10 @@ export function VoiceProvider({
         setPlaybackState("error");
         setActiveMessageId(null);
         if (typeof window !== "undefined") {
-          window.alert(rateLimitMsg);
+          const emoji = personaId === "hitesh" ? "🍵" : "💻";
+          toast.warning(`Voice limit reached — go watch ${sirName} on YouTube! ${emoji}`, {
+            duration: 4000,
+          });
         }
         return;
       }

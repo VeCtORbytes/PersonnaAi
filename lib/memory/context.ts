@@ -55,8 +55,10 @@ export function getTotalTokens(messages: Message[]): number {
 // Will summarize dropped messages via LLM call
 // Injected as first assistant message in trimmed history
 export async function summarizeHistory(
-  _messages: Message[],
-  _personaName: string
+  messages: Message[],
+  personaName: string
 ): Promise<string> {
+  void messages;
+  void personaName;
   throw new Error("summarizeHistory not implemented — Phase 2");
 }
