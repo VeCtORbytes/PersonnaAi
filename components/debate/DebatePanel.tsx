@@ -10,6 +10,8 @@ import type { DebateMessage } from "@/hooks/useDebate";
 import { cn } from "@/utils/helpers";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useRef } from "react";
+import { getPersona } from "@/data/personas/registry";
+import Image from "next/image";
 
 interface Props {
   persona: PersonaId;
@@ -42,6 +44,7 @@ export function DebatePanel({
   isLoading,
 }: Props) {
   const meta = PERSONA_META[persona];
+  const personaConfig = getPersona(persona);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const panelMessages = messages.filter(
@@ -72,11 +75,19 @@ export function DebatePanel({
       {/* Panel header */}
       <div
         className={cn(
-          "flex items-center gap-2 px-4 py-3 border-b",
+          "flex items-center gap-3 px-4 py-3 border-b",
           meta.header
         )}
       >
-        <span className="text-xl">{meta.emoji}</span>
+        <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 border border-border/40">
+          <Image
+            src={personaConfig.avatar}
+            alt={personaConfig.name}
+            width={24}
+            height={24}
+            className="w-full h-full object-cover"
+          />
+        </div>
         <div>
           <p className={cn("text-sm font-semibold", meta.badge)}>
             {meta.name}

@@ -5,7 +5,7 @@ export const hitesh: Persona = {
 
   name: "Hitesh Choudhary",
 
-  avatar: "/avatars/hitesh.png",
+  avatar: "/hiteshsir.png",
 
   tagline:
     "Software engineering isn't about memorizing syntax. It's about learning how to think.",

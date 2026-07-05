@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, type KeyboardEvent } from "react";
+import { useState, useRef, useEffect, type KeyboardEvent } from "react";
 import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "../../utils/helpers";
@@ -12,7 +12,20 @@ interface Props {
 
 export function MessageInput({ onSend, disabled }: Props) {
   const [value, setValue] = useState("");
+  const [shortcutText, setShortcutText] = useState("⌘K");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      !/Mac|iPad|iPhone|iPod/.test(navigator.userAgent)
+    ) {
+      const handle = setTimeout(() => {
+        setShortcutText("Ctrl+K");
+      }, 0);
+      return () => clearTimeout(handle);
+    }
+  }, []);
 
   const handleSend = () => {
     if (!value.trim() || disabled) return;
@@ -48,7 +61,9 @@ export function MessageInput({ onSend, disabled }: Props) {
           onInput={handleInput}
           disabled={disabled}
           placeholder={
-            disabled ? "Generating..." : "Ask a question... (Enter to send)"
+            disabled
+              ? "Generating..."
+              : `Ask a question... (Press ${shortcutText} for commands, Enter to send)`
           }
           rows={1}
           aria-label="Message input"

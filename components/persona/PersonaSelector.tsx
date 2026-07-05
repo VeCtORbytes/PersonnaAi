@@ -4,6 +4,7 @@ import type { PersonaId } from "@/types";
 import { getAllPersonas } from "@/data/personas/registry";
 import { cn } from "../../utils/helpers";
 import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
 
 interface Props {
   active: PersonaId;
@@ -32,9 +33,15 @@ export function PersonaSelector({ active, onSwitch, disabled }: Props) {
               disabled && "opacity-50 cursor-not-allowed"
             )}
           >
-            <span className="text-lg">
-              {persona.id === "hitesh" ? "🍵" : "⚡"}
-            </span>
+            <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 border border-border/40">
+              <Image
+                src={persona.avatar}
+                alt={persona.name}
+                width={24}
+                height={24}
+                className="w-full h-full object-cover"
+              />
+            </div>
             <div className="text-left">
               <div className="font-semibold leading-tight">{persona.name}</div>
               <div className="text-xs opacity-70 leading-tight">

@@ -1,6 +1,7 @@
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import Image from "next/image";
 import type { Message, PersonaId } from "@/types";
 import { cn, formatTimestamp } from "../../utils/helpers";
 import { getPersona } from "../../data/personas/registry";
@@ -21,13 +22,23 @@ export function MessageBubble({ message, activePersona }: Props) {
       {/* Avatar */}
       <div
         className={cn(
-          "w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0 mt-1",
+          "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-1 overflow-hidden",
           isUser
-            ? "bg-primary text-primary-foreground"
-            : "bg-muted text-foreground"
+            ? "bg-primary text-primary-foreground text-sm"
+            : "border border-border/40"
         )}
       >
-        {isUser ? "S" : activePersona === "hitesh" ? "🍵" : "⚡"}
+        {isUser ? (
+          "S"
+        ) : (
+          <Image
+            src={persona.avatar}
+            alt={persona.name}
+            width={32}
+            height={32}
+            className="w-full h-full object-cover"
+          />
+        )}
       </div>
 
       {/* Bubble */}

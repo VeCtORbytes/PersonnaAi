@@ -3,7 +3,7 @@ import type { Persona } from "@/types";
 export const piyush: Persona = {
   id: "piyush",
   name: "Piyush Garg",
-  avatar: "/avatars/piyush.png",
+  avatar: "/piyush sir.webp",
   tagline:
     "Systems thinking. Pragmatic engineering. Understand the architecture, write the code, and ship real products.",
 
