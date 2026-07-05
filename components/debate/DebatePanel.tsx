@@ -49,7 +49,17 @@ export function DebatePanel({
   );
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const viewport = bottomRef.current?.closest('[data-slot="scroll-area-viewport"]');
+    if (!viewport) return;
+
+    const lastMessage = panelMessages[panelMessages.length - 1];
+    const isUserMessage = lastMessage?.role === "user";
+    const isAtBottom =
+      viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight < 150;
+
+    if (isUserMessage || isAtBottom) {
+      bottomRef.current?.scrollIntoView({ behavior: "auto" });
+    }
   }, [panelMessages, streamingContent, isLoading]);
 
   return (
@@ -78,7 +88,7 @@ export function DebatePanel({
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4">
+      <ScrollArea className="flex-1 min-h-0 p-4">
         <div className="space-y-4">
           {panelMessages.map((msg) => (
             <motion.div

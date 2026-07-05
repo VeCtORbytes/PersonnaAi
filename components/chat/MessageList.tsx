@@ -24,13 +24,23 @@ export function MessageList({
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const viewport = bottomRef.current?.closest('[data-slot="scroll-area-viewport"]');
+    if (!viewport) return;
+
+    const lastMessage = messages[messages.length - 1];
+    const isUserMessage = lastMessage?.role === "user";
+    const isAtBottom =
+      viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight < 150;
+
+    if (isUserMessage || isAtBottom) {
+      bottomRef.current?.scrollIntoView({ behavior: "auto" });
+    }
   }, [messages, streamingContent, isLoading]);
 
   const isEmpty = messages.length === 0 && !isLoading;
 
   return (
-    <ScrollArea className="flex-1">
+    <ScrollArea className="flex-1 min-h-0">
       <div className="py-4">
         {isEmpty && (
           <div className="flex flex-col items-center justify-center h-full py-24 text-center text-muted-foreground">
