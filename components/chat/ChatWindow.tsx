@@ -190,7 +190,16 @@ export function ChatWindow({
 
             {/* Footer attribution */}
             <footer className="text-[10px] text-muted-foreground/60 py-1.5 text-center border-t border-border-subtle bg-background/40 backdrop-blur-xs select-none">
-              Built by Sarthak Gupta · ChaiCode GenAI Cohort
+              Built by{" "}
+              <a
+                href="https://github.com/VeCtORbytes"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground transition-colors font-medium"
+              >
+                Sarthak Gupta
+              </a>{" "}
+              · ChaiCode GenAI Cohort
             </footer>
           </div>
         </div>
