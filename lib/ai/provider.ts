@@ -13,16 +13,12 @@ export const groq = createGroq({
  * Fallback chain ordered from BEST → LIGHTEST quality.
  * When a model hits a rate-limit / quota error the next one is tried.
  *
- * Quality ranking on Groq (2025):
- *   1. meta-llama/llama-4-maverick-17b  — best reasoning & instruction quality
- *   2. meta-llama/llama-4-scout-17b     — fast, near-Maverick quality
- *   3. llama-3.3-70b-versatile          — reliable heavyweight, different quota bucket
- *   4. llama-3.1-8b-instant             — ultra-fast, good for simple tasks
- *   5. gemma2-9b-it                     — last resort, stable fallback
+ * Supported stable production models on Groq:
+ *   1. llama-3.3-70b-versatile  — best general instruction & reasoning quality
+ *   2. llama-3.1-8b-instant     — ultra-fast, lighter weight
+ *   3. gemma2-9b-it             — robust Google gemma fallback
  */
 export const FALLBACK_CHAIN: string[] = [
-  "meta-llama/llama-4-maverick-17b-128e-instruct",
-  "meta-llama/llama-4-scout-17b-16e-instruct",
   "llama-3.3-70b-versatile",
   "llama-3.1-8b-instant",
   "gemma2-9b-it",
