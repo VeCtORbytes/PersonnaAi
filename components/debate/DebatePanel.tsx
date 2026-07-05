@@ -24,16 +24,20 @@ const PERSONA_META = {
   hitesh: {
     emoji: "🍵",
     name: "Hitesh Choudhary",
-    accent: "border-amber-500/30 bg-amber-500/5",
-    header: "bg-amber-500/10 border-amber-500/20",
-    badge: "text-amber-600 dark:text-amber-400",
+    accent: "border-amber-500/20 bg-background/30",
+    header: "bg-amber-500/[0.03] border-amber-500/10",
+    badge: "text-amber-500 font-bold",
+    cardBg: "bg-[#1A1916]/40 border-amber-500/10 text-foreground",
+    statusDot: "bg-amber-500",
   },
   piyush: {
     emoji: "⚡",
     name: "Piyush Garg",
-    accent: "border-violet-500/30 bg-violet-500/5",
-    header: "bg-violet-500/10 border-violet-500/20",
-    badge: "text-violet-600 dark:text-violet-400",
+    accent: "border-violet-500/20 bg-background/30",
+    header: "bg-violet-500/[0.03] border-violet-500/10",
+    badge: "text-violet-400 font-bold",
+    cardBg: "bg-[#14121A]/40 border-violet-500/10 text-foreground",
+    statusDot: "bg-violet-500",
   },
 };
 
@@ -88,12 +92,17 @@ export function DebatePanel({
             className="w-full h-full object-cover"
           />
         </div>
-        <div>
-          <p className={cn("text-sm font-semibold", meta.badge)}>
-            {meta.name}
-          </p>
+        <div className="flex items-center justify-between w-full">
+          <div>
+            <p className={cn("text-sm font-semibold", meta.badge)}>
+              {meta.name}
+            </p>
+          </div>
           {isLoading && (
-            <p className="text-xs text-muted-foreground">responding...</p>
+            <div className="flex items-center gap-1.5 bg-background/50 border border-border/60 px-2 py-0.5 rounded-full select-none">
+              <span className={cn("h-1.5 w-1.5 rounded-full animate-pulse", meta.statusDot)} />
+              <span className="text-[9px] uppercase tracking-wider font-semibold text-muted-foreground">Responding</span>
+            </div>
           )}
         </div>
       </div>
@@ -108,10 +117,10 @@ export function DebatePanel({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2 }}
               className={cn(
-                "text-sm rounded-xl px-4 py-3",
+                "text-sm rounded-xl px-4 py-3 border",
                 msg.role === "user"
-                  ? "bg-muted text-muted-foreground italic text-xs"
-                  : "bg-background text-foreground"
+                  ? "bg-muted/30 text-muted-foreground italic text-xs border-border/50"
+                  : meta.cardBg
               )}
             >
               {msg.role === "user" ? (
@@ -156,7 +165,7 @@ export function DebatePanel({
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-sm rounded-xl px-4 py-3 bg-background text-foreground"
+              className={cn("text-sm rounded-xl px-4 py-3 border", meta.cardBg)}
             >
               <ReactMarkdown>{streamingContent}</ReactMarkdown>
             </motion.div>

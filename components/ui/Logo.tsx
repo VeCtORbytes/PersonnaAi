@@ -51,20 +51,28 @@ export function Logo({ className, size = 28 }: LogoProps) {
         }
         .logo-steam-1 {
           animation: steam-drift 3.5s ease-in-out infinite;
-          transform-origin: 50px 32px;
+          transform-origin: center bottom;
+          transform-box: fill-box;
         }
         .logo-steam-2 {
           animation: steam-drift 2.8s ease-in-out infinite 0.6s;
-          transform-origin: 50px 32px;
+          transform-origin: center bottom;
+          transform-box: fill-box;
         }
         .logo-node-violet {
           animation: node-glow 3s ease-in-out infinite;
+          transform-origin: center;
+          transform-box: fill-box;
         }
         .logo-node-amber-1 {
           animation: node-glow-amber 3.5s ease-in-out infinite 0.4s;
+          transform-origin: center;
+          transform-box: fill-box;
         }
         .logo-node-amber-2 {
           animation: node-glow-amber 3.5s ease-in-out infinite 0.8s;
+          transform-origin: center;
+          transform-box: fill-box;
         }
       `}</style>
 

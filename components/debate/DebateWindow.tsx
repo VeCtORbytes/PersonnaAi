@@ -30,7 +30,7 @@ export function DebateWindow({ onExit }: Props) {
   return (
     <div className="flex flex-col h-screen bg-background">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 py-3 border-b border-border">
+      <header className="flex items-center justify-between px-4 py-3 border-b border-border relative bg-background">
         <div className="flex items-center gap-2">
           <Swords className="h-5 w-5 text-muted-foreground" />
           <div>
@@ -53,6 +53,11 @@ export function DebateWindow({ onExit }: Props) {
           >
             <Trash2 className="h-4 w-4" />
           </Button>
+        </div>
+        {/* Split accent bar under header */}
+        <div className="absolute bottom-0 inset-x-0 h-[1.5px] flex">
+          <div className="flex-1 bg-amber-500/40" />
+          <div className="flex-1 bg-violet-500/40" />
         </div>
       </header>
 

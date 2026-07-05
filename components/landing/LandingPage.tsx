@@ -261,14 +261,14 @@ export function LandingPage() {
                 className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full border border-border hover:border-amber-500/40 hover:bg-amber-500/5 transition-all text-muted-foreground hover:text-foreground shadow-sm"
               >
                 <Swords className="h-3.5 w-3.5 text-amber-500" />
-                <span>⚔️ Debate Mode</span>
+                <span>Debate Mode</span>
               </Link>
               <Link
                 href="/chat?voice=true"
                 className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full border border-border hover:border-violet-500/40 hover:bg-violet-500/5 transition-all text-muted-foreground hover:text-foreground shadow-sm"
               >
                 <Mic className="h-3.5 w-3.5 text-violet-500" />
-                <span>🎙️ Voice Mode</span>
+                <span>Voice Mode</span>
               </Link>
               <button
                 onClick={() => {
@@ -277,7 +277,7 @@ export function LandingPage() {
                 className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full border border-border hover:border-emerald-500/40 hover:bg-emerald-500/5 transition-all text-muted-foreground hover:text-foreground shadow-sm"
               >
                 <Sparkles className="h-3.5 w-3.5 text-emerald-500" />
-                <span>💡 Smart Tips</span>
+                <span>Smart Tips</span>
               </button>
             </div>
           </motion.div>
