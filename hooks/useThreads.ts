@@ -27,10 +27,10 @@ async function generateTitle(
   }
 }
 
-export function useThreads() {
+export function useThreads(initialPersona?: PersonaId, userName?: string) {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
-  const [activePersona, setActivePersona] = useState<PersonaId>("hitesh");
+  const [activePersona, setActivePersona] = useState<PersonaId>(initialPersona ?? "hitesh");
   const [isLoading, setIsLoading] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -41,16 +41,33 @@ export function useThreads() {
       const stored = loadThreads();
       if (stored.length > 0) {
         setThreads(stored);
-        setActiveThreadId(stored[0].id);
-        setActivePersona(stored[0].personaId);
+        
+        // Prioritize initialPersona if provided to prevent URL route loading race conditions
+        if (initialPersona) {
+          const matchingThread = stored.find((t) => t.personaId === initialPersona);
+          if (matchingThread) {
+            setActiveThreadId(matchingThread.id);
+            setActivePersona(initialPersona);
+          } else {
+            const fresh = createThread(initialPersona);
+            setThreads((prev) => [fresh, ...prev]);
+            setActiveThreadId(fresh.id);
+            setActivePersona(initialPersona);
+          }
+        } else {
+          setActiveThreadId(stored[0].id);
+          setActivePersona(stored[0].personaId);
+        }
       } else {
-        const initial = createThread("hitesh");
+        const defaultPersona = initialPersona ?? "hitesh";
+        const initial = createThread(defaultPersona);
         setThreads([initial]);
         setActiveThreadId(initial.id);
+        setActivePersona(defaultPersona);
       }
     }, 0);
     return () => clearTimeout(handle);
-  }, []);
+  }, [initialPersona]);
 
   // Persist on every change
   useEffect(() => {
@@ -171,6 +188,7 @@ export function useThreads() {
             message: content.trim(),
             personaId: activePersona,
             history: currentMessages,
+            userName,
           }),
         });
 

@@ -6,7 +6,7 @@ import { generateId } from "../utils/helpers";
 
 type Histories = Record<PersonaId, Message[]>;
 
-export function useChat() {
+export function useChat(userName?: string) {
   const [activePersona, setActivePersona] = useState<PersonaId>("hitesh");
   const [isLoading, setIsLoading] = useState(false);
   const [histories, setHistories] = useState<Histories>({
@@ -52,6 +52,7 @@ export function useChat() {
             message: content.trim(),
             personaId: activePersona,
             history: histories[activePersona],
+            userName,
           }),
         });
 

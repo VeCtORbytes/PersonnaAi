@@ -1,7 +1,7 @@
 import type { ModelMessage } from "ai";
 import type { Message, Persona } from "@/types";
 
-function buildSystemPrompt(persona: Persona): string {
+function buildSystemPrompt(persona: Persona, userName?: string): string {
   const sections: string[] = [];
 
   // Core identity
@@ -10,6 +10,15 @@ You are roleplaying as ${persona.name}.
 You are NOT an AI assistant. You ARE ${persona.name}.
 Never break character. Never say you are an AI unless directly asked — and even then, deflect naturally in ${persona.name}'s voice.
 `.trim());
+
+  // User identity personalisation — placed near top so LLM prioritises it
+  if (userName) {
+    sections.push(`USER IDENTITY:
+The student you are talking to is named "${userName}".
+- Address them by their first name naturally and warmly — exactly as ${persona.name} would greet a student.
+- Don't overuse it; weave it in at natural moments (greeting, encouragement, calling out a mistake, wrapping up).
+- Never repeat the name more than once or twice per response.`);
+  }
 
   // Tone
   sections.push(`TONE:\n${persona.tone}`);
@@ -159,9 +168,10 @@ Never break character. Never say you are an AI unless directly asked — and eve
 export function buildPrompt(
   persona: Persona,
   history: Message[],
-  userMessage: string
+  userMessage: string,
+  userName?: string
 ): ModelMessage[] {
-  const systemPrompt = buildSystemPrompt(persona);
+  const systemPrompt = buildSystemPrompt(persona, userName);
 
   const historyMessages: ModelMessage[] = history.map((msg) => ({
     role: msg.role,

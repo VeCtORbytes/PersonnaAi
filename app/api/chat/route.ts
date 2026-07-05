@@ -16,10 +16,11 @@ export const runtime = "edge";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { message, personaId, history } = body as {
+    const { message, personaId, history, userName } = body as {
       message: string;
       personaId: PersonaId;
       history: Message[];
+      userName?: string;
     };
 
     // Validate
@@ -40,7 +41,9 @@ export async function POST(req: NextRequest) {
     // Build context once — shared across all retry attempts
     const persona = getPersona(personaId);
     const trimmedHistory = trimHistory(history ?? [], 4000);
-    const messages = buildPrompt(persona, trimmedHistory, message);
+    // Extract first name only for a natural feel (e.g. "Sarthak" from "Sarthak Gupta")
+    const firstName = userName?.split(" ")[0]?.trim() || undefined;
+    const messages = buildPrompt(persona, trimmedHistory, message, firstName);
 
     // --- Model fallback loop ---
     let lastError: unknown = null;

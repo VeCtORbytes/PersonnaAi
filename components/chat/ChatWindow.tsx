@@ -18,7 +18,7 @@ import { HexagonPattern } from "@/components/ui/HexagonPattern";
 import Link from "next/link";
 import type { PersonaId } from "@/types";
 import { Logo } from "@/components/ui/Logo";
-import { Show, UserButton } from "@clerk/nextjs";
+import { Show, UserButton, useUser } from "@clerk/nextjs";
 
 interface ChatWindowProps {
   initialPersona?: PersonaId;
@@ -43,6 +43,9 @@ export function ChatWindow({
     }
   }, []);
 
+  const { user } = useUser();
+  const userName = user?.fullName || undefined;
+
   const {
     threads,
     activeThreadId,
@@ -58,22 +61,7 @@ export function ChatWindow({
     deleteThread,
     newThread,
     clearThread,
-  } = useThreads();
-
-  const isInitialPersonaApplied = useRef(false);
-
-  // Override active persona on mount if initialPersona search param is provided
-  useEffect(() => {
-    if (initialPersona && !isInitialPersonaApplied.current) {
-      isInitialPersonaApplied.current = true;
-      if (initialPersona !== activePersona) {
-        const handle = setTimeout(() => {
-          switchPersona(initialPersona);
-        }, 60);
-        return () => clearTimeout(handle);
-      }
-    }
-  }, [initialPersona, switchPersona, activePersona]);
+  } = useThreads(initialPersona, userName);
 
   // Synchronize active state changes back to URL query parameters
   useEffect(() => {
