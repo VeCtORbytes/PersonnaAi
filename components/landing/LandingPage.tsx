@@ -181,6 +181,14 @@ export function LandingPage() {
                 <p className="text-sm text-muted-foreground italic px-4 py-2 border-y border-border-subtle w-full">
                   &ldquo;Slower you learn, faster you code.&rdquo;
                 </p>
+
+                {/* Cultural/Branding Associations */}
+                <div className="flex flex-wrap items-center justify-center gap-1.5 mt-1">
+                  <span className="text-[10px] bg-muted/60 text-muted-foreground px-2 py-0.5 rounded-md border border-border">🍵 ChaiCode</span>
+                  <span className="text-[10px] bg-muted/60 text-muted-foreground px-2 py-0.5 rounded-md border border-border">👕 Signature Grey Tee</span>
+                  <span className="text-[10px] bg-muted/60 text-muted-foreground px-2 py-0.5 rounded-md border border-border">🏰 Jaipur NIT Alumni</span>
+                  <span className="text-[10px] bg-muted/60 text-muted-foreground px-2 py-0.5 rounded-md border border-border">✈️ 39+ Countries</span>
+                </div>
               </div>
 
               <div className="w-full mt-6">
@@ -223,6 +231,14 @@ export function LandingPage() {
                 <p className="text-sm text-muted-foreground italic px-4 py-2 border-y border-border-subtle w-full">
                   &ldquo;I build devs, not just apps.&rdquo;
                 </p>
+
+                {/* Cultural/Branding Associations */}
+                <div className="flex flex-wrap items-center justify-center gap-1.5 mt-1">
+                  <span className="text-[10px] bg-muted/60 text-muted-foreground px-2 py-0.5 rounded-md border border-border">🧴 Minoxidil Jokes</span>
+                  <span className="text-[10px] bg-muted/60 text-muted-foreground px-2 py-0.5 rounded-md border border-border">💔 Kaat ke toh wo gyi</span>
+                  <span className="text-[10px] bg-muted/60 text-muted-foreground px-2 py-0.5 rounded-md border border-border">💀 Is Docker Dead?</span>
+                  <span className="text-[10px] bg-muted/60 text-muted-foreground px-2 py-0.5 rounded-md border border-border">🤖 AI Agent SDK</span>
+                </div>
               </div>
 
               <div className="w-full mt-6">
