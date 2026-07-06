@@ -6,6 +6,7 @@ import type { Message, PersonaId } from "@/types";
 import { cn, formatTimestamp } from "../../utils/helpers";
 import { getPersona } from "../../data/personas/registry";
 import { VoiceButton } from "./VoiceButton";
+import { useUser } from "@clerk/nextjs";
 
 interface Props {
   message: Message;
@@ -14,6 +15,7 @@ interface Props {
 
 export function MessageBubble({ message, activePersona }: Props) {
   const isUser = message.role === "user";
+  const { user } = useUser();
   const persona = getPersona(activePersona);
   const voiceEnabled = !isUser && persona.voice?.enabled && message.content.trim() !== "";
 
@@ -29,7 +31,17 @@ export function MessageBubble({ message, activePersona }: Props) {
         )}
       >
         {isUser ? (
-          "S"
+          user?.imageUrl ? (
+            <Image
+              src={user.imageUrl}
+              alt={user.fullName || "User"}
+              width={32}
+              height={32}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            user?.firstName?.charAt(0) || "S"
+          )
         ) : (
           <Image
             src={persona.avatar}
