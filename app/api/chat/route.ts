@@ -6,22 +6,23 @@ import { buildPrompt } from "@/lib/prompt/builder";
 import { trimHistory } from "@/lib/memory/context";
 import {
   AI_CONFIG,
-  FALLBACK_CHAIN,
+  CHAT_MODEL,
   getModel,
-  isRateLimitError,
 } from "@/lib/ai/provider";
 
 export const runtime = "edge";
 
 export async function POST(req: NextRequest) {
+  let personaId: PersonaId = "hitesh";
   try {
     const body = await req.json();
-    const { message, personaId, history, userName } = body as {
+    const { message, personaId: parsedPersonaId, history, userName } = body as {
       message: string;
       personaId: PersonaId;
       history: Message[];
       userName?: string;
     };
+    personaId = parsedPersonaId;
 
     // Validate
     if (!message?.trim()) {
@@ -38,88 +39,62 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Build context dynamically inside the fallback loop
     const persona = getPersona(personaId);
     const firstName = userName?.split(" ")[0]?.trim() || undefined;
 
-    // --- Model fallback loop ---
-    let lastError: unknown = null;
+    // Trim history to 4000 characters to keep it compact and clean
+    const trimmedHistory = trimHistory(history ?? [], 4000);
+    // Since we are running on the primary model, isFallback is false (we want full system prompt examples)
+    const messages = buildPrompt(persona, trimmedHistory, message, firstName, false);
 
-    for (let i = 0; i < FALLBACK_CHAIN.length; i++) {
-      const modelId = FALLBACK_CHAIN[i];
-      const isFallback = i > 0;
+    console.log(`[/api/chat] Sending request to Groq model: ${CHAT_MODEL}`);
 
-      try {
-        console.log(
-          `[/api/chat] Attempting model ${i + 1}/${FALLBACK_CHAIN.length}: ${modelId}`
-        );
+    const result = streamText({
+      model: getModel(CHAT_MODEL),
+      messages,
+      temperature: AI_CONFIG.temperature,
+      maxOutputTokens: AI_CONFIG.maxTokens,
+      allowSystemInMessages: true,
+      onFinish() {
+        console.log(`[/api/chat] Completed with model: ${CHAT_MODEL}`);
+      },
+    });
 
-        // Set tight limits for fallback models to fit safely under strict 6000 TPM quotas
-        const trimLimit = isFallback ? 1000 : 4000;
-        const trimmedHistory = trimHistory(history ?? [], trimLimit);
-        const messages = buildPrompt(persona, trimmedHistory, message, firstName, isFallback);
+    // Eagerly trigger and await the response headers to catch connection/auth/rate-limit errors.
+    await result.response;
 
-        const result = streamText({
-          model: getModel(modelId),
-          messages,
-          temperature: AI_CONFIG.temperature,
-          maxOutputTokens: AI_CONFIG.maxTokens,
-          allowSystemInMessages: true,
-          // Attach which model was actually used as a response header
-          onFinish() {
-            console.log(`[/api/chat] Completed with model: ${modelId}`);
-          },
-        });
+    const response = result.toTextStreamResponse();
+    const headers = new Headers(response.headers);
+    headers.set("X-Model-Used", CHAT_MODEL);
 
-        // Eagerly trigger and await the response headers to catch connection/auth/rate-limit errors.
-        await result.response;
+    return new Response(response.body, {
+      status: response.status,
+      headers,
+    });
+  } catch (error: any) {
+    console.error("[/api/chat] Error:", error);
 
-        // Attach model info in a custom header so the client can display it
-        const response = result.toTextStreamResponse();
-        const headers = new Headers(response.headers);
-        headers.set("X-Model-Used", modelId);
-        if (i > 0) {
-          headers.set("X-Model-Fallback", "true");
-          headers.set("X-Fallback-Index", String(i));
-          console.warn(
-            `[/api/chat] ⚠️ Serving via fallback model (${i}): ${modelId}`
-          );
-        }
+    // Identify rate limit errors (Status 429, limit exceeded, etc.)
+    const isRateLimit =
+      error?.status === 429 ||
+      error?.statusCode === 429 ||
+      String(error?.message ?? "").toLowerCase().includes("rate limit") ||
+      String(error?.message ?? "").toLowerCase().includes("limit exceeded") ||
+      String(error?.message ?? "").toLowerCase().includes("tpm");
 
-        return new Response(response.body, {
-          status: response.status,
-          headers,
-        });
-      } catch (err) {
-        lastError = err;
-        console.warn(
-          `[/api/chat] Error hit on model "${modelId}" — trying next fallback. Error:`,
-          err instanceof Error ? err.message : err
-        );
-        // Automatically cascade to the next fallback for high-availability
-        continue;
-      }
-    }
+    const customMessage = personaId === "hitesh"
+      ? "Lala is busy scaling systems right now! Please try again in a few seconds. 🍵"
+      : "Server is heavy, mat kar lala, mat kar! 😂 Try again in a minute. 💻";
 
-    // All models exhausted
-    console.error("[/api/chat] All models failed. Last error:", lastError);
+    const errorObj = {
+      error: isRateLimit ? customMessage : "Something went wrong. Please try again.",
+      code: isRateLimit ? "RATE_LIMIT_ALL" : "INTERNAL_ERROR",
+    };
 
     return new Response(
-      JSON.stringify({
-        error: "All AI models are currently rate-limited or unavailable. Please try again in a minute.",
-        code: "RATE_LIMIT_ALL",
-      }),
+      JSON.stringify(errorObj),
       {
-        status: 429,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-  } catch (error) {
-    console.error("[/api/chat] Unhandled error:", error);
-    return new Response(
-      JSON.stringify({ error: "Internal server error" }),
-      {
-        status: 500,
+        status: isRateLimit ? 429 : 500,
         headers: { "Content-Type": "application/json" },
       }
     );
