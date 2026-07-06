@@ -29,11 +29,18 @@ export class AudioPlayer {
       preserves = false;
     }
 
-    audio.defaultPlaybackRate = rate;
-    audio.playbackRate = rate;
-    if ("preservesPitch" in audio) {
-      (audio as any).preservesPitch = preserves;
-    }
+    const applySpeedAndPitch = () => {
+      audio.defaultPlaybackRate = rate;
+      audio.playbackRate = rate;
+      if ("preservesPitch" in audio) {
+        (audio as any).preservesPitch = preserves;
+      }
+    };
+
+    applySpeedAndPitch();
+    audio.addEventListener("canplay", applySpeedAndPitch);
+    audio.addEventListener("play", applySpeedAndPitch);
+    audio.addEventListener("playing", applySpeedAndPitch);
 
     // Wire up Web Audio API for waveform
     try {

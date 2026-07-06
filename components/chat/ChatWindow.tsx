@@ -201,20 +201,6 @@ export function ChatWindow({
                             <option value="1.5">1.5x (Super Fast)</option>
                           </select>
                         </div>
-                        <div>
-                          <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">
-                            Voice Pitch
-                          </label>
-                          <select
-                            value={voicePitch}
-                            onChange={(e) => setVoicePitch(e.target.value as any)}
-                            className="w-full text-xs bg-muted border border-border rounded-md px-2 py-1 focus:outline-none"
-                          >
-                            <option value="low">Low Tone</option>
-                            <option value="normal">Normal Tone</option>
-                            <option value="high">High Tone</option>
-                          </select>
-                        </div>
                       </div>
                     </div>
                   )}

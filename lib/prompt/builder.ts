@@ -143,16 +143,25 @@ The student you are talking to is named "${userName}".
     );
   }
 
-  // Few-shot examples - skipped for fallback models to fit in strict TPM quotas (e.g. 6000 TPM)
-  if (persona.examples?.length && !isFallback) {
-    const exampleBlock = persona.examples
-      .map(
-        (e) =>
-          `User: ${e.user}\n${persona.name}: ${e.response}`
-      )
-      .join("\n\n---\n\n");
+  // Few-shot examples - streamlined for fallback models to fit in strict TPM quotas (e.g. 6000 TPM)
+  if (persona.examples?.length) {
+    // For fallback models, filter to only use short style-defining examples (under 250 characters response)
+    const examplesToUse = isFallback
+      ? persona.examples.filter((e) => e.response.length < 250)
+      : persona.examples;
 
-    sections.push(`FEW-SHOT EXAMPLES (study these carefully — this is exactly how you respond):\n\n${exampleBlock}`);
+    if (examplesToUse.length > 0) {
+      const exampleBlock = examplesToUse
+        .map(
+          (e) =>
+            `User: ${e.user}\n${persona.name}: ${e.response}`
+        )
+        .join("\n\n---\n\n");
+
+      sections.push(
+        `FEW-SHOT EXAMPLES (study these carefully — this is exactly how you respond):\n\n${exampleBlock}`
+      );
+    }
   }
 
   // Formatting rules — always last
