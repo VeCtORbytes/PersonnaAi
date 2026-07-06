@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateText } from "ai";
-import { groq } from "@/lib/ai/provider";
+import { getModel } from "@/lib/ai/provider";
 import { synthesizeSpeech } from "@/lib/voice/provider";
 import { rateLimiter } from "@/lib/rateLimiter/provider";
 import { getPersona } from "@/data/personas/registry";
@@ -56,8 +56,8 @@ export async function POST(req: NextRequest) {
     // 4. Translating or normalising Hinglish using a fast LLM based on script support
     let textToSynthesize = text;
     try {
-      // Using llama-3.1-8b-instant to stay within organization token quotas (TPD) on Groq
-      const translationModel = groq("llama-3.1-8b-instant");
+      // Using gpt-4o-mini for highly accurate phonetic Hinglish-to-Devanagari translations
+      const translationModel = getModel("gpt-4o-mini");
       
       const systemPrompt =
         scriptType === "roman"
