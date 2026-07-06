@@ -42,9 +42,9 @@ export async function POST(req: NextRequest) {
     const persona = getPersona(personaId);
     const firstName = userName?.split(" ")[0]?.trim() || undefined;
 
-    // Trim history to 1000 characters to keep it compact under 6000 TPM limit
-    const trimmedHistory = trimHistory(history ?? [], 1000);
-    // Since we are running on llama-3.1-8b-instant, we must use the streamlined mode (isFallback = true)
+    // Trim history to 2000 characters to keep context rich under the 12,000 TPM limit
+    const trimmedHistory = trimHistory(history ?? [], 2000);
+    // We use the streamlined mode (isFallback = true) to compress prompt size to ~2,500 tokens
     const messages = buildPrompt(persona, trimmedHistory, message, firstName, true);
 
     console.log(`[/api/chat] Sending request to Groq model: ${CHAT_MODEL}`);

@@ -182,12 +182,9 @@ export function buildPrompt(
   userName?: string,
   isFallback: boolean = false
 ): ModelMessage[] {
-  // If there is conversation history, we omit the massive static system prompt to save tokens,
-  // speed up latency, and stay safely within Groq's token rate limits.
-  // The model will infer its tone and signature Hinglish style from the previous turns in the history.
-  const systemPrompt = history.length > 0
-    ? `You are roleplaying as ${persona.name}. Maintain your character identity, Hinglish rules, and tone exactly as shown in the conversation history.`
-    : buildSystemPrompt(persona, userName, isFallback);
+  // Always include the system prompt to ensure the model maintains character rules and persona accuracy.
+  // We use the streamlined mode (isFallback = true) to compress the prompt size and fit under the 12k TPM limit.
+  const systemPrompt = buildSystemPrompt(persona, userName, isFallback);
 
   const historyMessages: ModelMessage[] = history.map((msg) => ({
     role: msg.role,
