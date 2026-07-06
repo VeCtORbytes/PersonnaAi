@@ -32,11 +32,9 @@ export function MessageBubble({ message, activePersona }: Props) {
       >
         {isUser ? (
           user?.imageUrl ? (
-            <Image
+            <img
               src={user.imageUrl}
               alt={user.fullName || "User"}
-              width={32}
-              height={32}
               className="w-full h-full object-cover"
             />
           ) : (
