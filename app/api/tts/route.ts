@@ -54,7 +54,18 @@ export async function POST(req: NextRequest) {
     const scriptType = persona.voice?.scriptType ?? "devanagari";
 
     // 4. Translating or normalising Hinglish using a fast LLM based on script support
-    let textToSynthesize = text;
+    const cleanPunctuation = (str: string) => {
+      return str
+        .replace(/[—–-]/g, ", ") // Convert hyphens/dashes to commas for soft pauses
+        .replace(/\s*,\s*/g, ", ") // Ensure single trailing space
+        .replace(/\s*\.\s*/g, ". ") // Ensure single trailing space
+        .replace(/\s*!\s*/g, "! ") // Ensure single trailing space
+        .replace(/\s*\?\s*/g, "? ") // Ensure single trailing space
+        .replace(/\s+/g, " ") // Clean multiple spaces
+        .trim();
+    };
+
+    let textToSynthesize = cleanPunctuation(text);
     try {
       // Using gpt-4o-mini for highly accurate phonetic Hinglish-to-Devanagari translations
       const translationModel = getModel("gpt-4o-mini");
@@ -69,13 +80,13 @@ Rules:
 2. Keep English words exactly as they are written in the input text in English script (e.g., "redis", "cache", "save", "video", "youtube", "welcome").
 3. The output must be written 100% in English/Latin script. No Devanagari characters allowed.
 4. Do not add, remove, or modify the meaning of any words.
-5. Keep all original punctuation (., !, ?, ,, -) exactly where they were. Do not drop or add symbols.
+5. Replace all hyphens (-), em-dashes (—), and double dashes (--) with standard commas (,) or periods (.) depending on the sentence flow. Ensure there is a single space after every punctuation mark (.,!?,).
 6. Under no circumstances should you add any explanation, notes, or introductory/trailing comments. You must output the final result wrapped in <result> and </result> tags.
 7. NEVER include words like "Note:", "Explanation:", "I have", or any conversational comments anywhere inside the <result> and </result> tags. The content inside the tags must ONLY be the translated speech text itself.
 
 Examples:
-Input: Perfect time to code then. Chai aur code — best combination hai.
-Output: <result>Perfect time to code then. Chai aur code — best combination hai.</result>
+Input: Perfect time to code then. Chai aur code, best combination hai.
+Output: <result>Perfect time to code then. Chai aur code, best combination hai.</result>
 
 Input: hello sir !! welcome nahi karoge
 Output: <result>hello sir !! welcome nahi karoge</result>
@@ -93,7 +104,7 @@ Rules:
 2. Only transliterate Roman-script Hindi words phonetically into Devanagari script (e.g., "bhai" -> "भाई", "aayega" -> "आएगा", "rha" -> "रहा", "peete" -> "पीते", "hai" -> "है", "hoon" -> "हूँ").
 3. Capitalized Hindi words at the start of a sentence (like 'Dekho', 'Hanji', 'Bhai', 'Acha', 'Maan', 'Keso') must be transliterated to Devanagari script. Do not leave them in English script just because they are capitalized.
 4. Do not add, remove, or modify any words. The output must have the exact same sequence of words, with Hindi words in Devanagari script and English words in English script.
-5. Use standard English punctuation (., !, ?, ,, -) in the output. Do NOT use the Devanagari full stop (।). Keep all original commas, hyphens, exclamation marks, and periods exactly where they were.
+5. Replace all hyphens (-), em-dashes (—), and double dashes (--) with standard commas (,) or periods (.) depending on the sentence flow. Ensure there is a single space after every punctuation mark (.,!?,). Do NOT use the Devanagari full stop (।).
 6. Under no circumstances should you add any explanation, notes, or introductory/trailing comments. You must output the final result wrapped in <result> and </result> tags.
 7. NEVER include words like "Note:", "Explanation:", "I have", or any conversational comments anywhere inside the <result> and </result> tags. The content inside the tags must ONLY be the translated speech text itself.
 
@@ -101,8 +112,8 @@ Examples:
 Input: Hanji, main Hitesh Choudhary hoon. Main ek software engineer hoon aur ab full-time educator ban gaya hoon.
 Output: <result>हाँजी, मैं Hitesh Choudhary हूँ। मैं एक software engineer हूँ और ab full-time educator बन गया हूँ.</result>
 
-Input: Perfect time to code then. Chai aur code — best combination hai.
-Output: <result>Perfect time to code then. चाय और code — best combination है.</result>
+Input: Perfect time to code then. Chai aur code, best combination hai.
+Output: <result>Perfect time to code then. चाय और code, best combination है.</result>
 
 Input: hello sir !! welcome nahi karoge
 Output: <result>hello sir !! welcome नहीं करोगे</result>
@@ -117,7 +128,7 @@ Output: <result>देखो, ye question बहुत deep है! Especially �
         model: translationModel,
         temperature: 0.0,
         system: systemPrompt,
-        prompt: `Input: ${text}\nOutput:`,
+        prompt: `Input: ${textToSynthesize}\nOutput:`,
       });
 
       if (translatedText?.trim()) {
@@ -139,7 +150,7 @@ Output: <result>देखो, ye question बहुत deep है! Especially �
         }
 
         if (extracted) {
-          textToSynthesize = extracted;
+          textToSynthesize = cleanPunctuation(extracted);
           console.log(
             `[TTS Translation - ${scriptType}] Original: "${text}" -> Processed: "${textToSynthesize}"`
           );
