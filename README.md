@@ -2,7 +2,7 @@
 
 > AI-powered conversations with India's top tech educators — Hitesh Choudhary and Piyush Garg.
 
-🔗 **Live Demo**: https://brewedminds.vercel.app
+🔗 **Live Demo**: [https://brewedminds.vercel.app](https://personna-ai.vercel.app/)
 
 ---
 
