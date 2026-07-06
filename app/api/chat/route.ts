@@ -42,10 +42,10 @@ export async function POST(req: NextRequest) {
     const persona = getPersona(personaId);
     const firstName = userName?.split(" ")[0]?.trim() || undefined;
 
-    // Trim history to 4000 characters to keep it compact and clean
-    const trimmedHistory = trimHistory(history ?? [], 4000);
-    // Since we are running on the primary model, isFallback is false (we want full system prompt examples)
-    const messages = buildPrompt(persona, trimmedHistory, message, firstName, false);
+    // Trim history to 1000 characters to keep it compact under 6000 TPM limit
+    const trimmedHistory = trimHistory(history ?? [], 1000);
+    // Since we are running on llama-3.1-8b-instant, we must use the streamlined mode (isFallback = true)
+    const messages = buildPrompt(persona, trimmedHistory, message, firstName, true);
 
     console.log(`[/api/chat] Sending request to Groq model: ${CHAT_MODEL}`);
 
