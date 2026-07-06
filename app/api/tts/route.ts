@@ -96,33 +96,32 @@ Output: <result>is bhai ne mujhe redis samajh liya, cache me reels save kar raha
 
 Input: Mere liye chai ek comfort zone hai. Chai peeke code likhna mera favorite hai.
 Output: <result>Mere liye chai ek comfort zone hai. Chai peeke code likhna mera favorite hai.</result>`
-          : `You are a strict phonetic transliteration tool for Text-to-Speech.
-Your job is to convert Roman-script Hindi words (Hinglish) into native Devanagari script (Hindi characters), while preserving all English words exactly in English script.
+          : `You are a top-tier Hinglish-to-Devanagari translation and transliteration engine optimized for a Hindi Text-to-Speech (TTS) voice model.
+Your task is to convert Hinglish text into a clean, natural Devanagari-focused script that a native Hindi voice model can read with perfect flow, meaning, and accent.
 
 Rules:
-1. Keep ALL English words (including conversational words, technical terms, coding terms, adverbs, and nouns) exactly as they are written in the input text in English script. Do NOT translate them into Hindi (e.g., do NOT change "especially" to "especially", do NOT change "welcome" to "welcome", do NOT change "perfect" to "perfect", do NOT change "time" to "time").
-2. Only transliterate Roman-script Hindi words phonetically into Devanagari script (e.g., "bhai" -> "भाई", "aayega" -> "आएगा", "rha" -> "रहा", "peete" -> "पीते", "hai" -> "है", "hoon" -> "हूँ").
-3. Capitalized Hindi words at the start of a sentence (like 'Dekho', 'Hanji', 'Bhai', 'Acha', 'Maan', 'Keso') must be transliterated to Devanagari script. Do not leave them in English script just because they are capitalized.
-4. Do not add, remove, or modify any words. The output must have the exact same sequence of words, with Hindi words in Devanagari script and English words in English script.
-5. Replace all hyphens (-), em-dashes (—), and double dashes (--) with standard commas (,) or periods (.) depending on the sentence flow. Ensure there is a single space after every punctuation mark (.,!?,). Do NOT use the Devanagari full stop (।).
+1. Translate all Hindi words written in Roman letters into correct Devanagari script (e.g., "bhai" -> "भाई", "aayega" -> "आएगा", "rha" -> "रहा", "peete" -> "पीते", "hai" -> "है", "hoon" -> "हूँ", "se" -> "से", "ko" -> "को", "ye" -> "यह", "ab" -> "अब").
+2. Transliterate general, conversational English words and fillers phonetically into Devanagari script so the Hindi voice model can pronounce them naturally without changing its script delivery mode (e.g., "actually" -> "एक्चुअली", "basically" -> "बेसिकली", "especially" -> "एस्पेशली", "welcome" -> "वेलकम", "perfect" -> "परफेक्ट", "time" -> "टाइम", "question" -> "क्वेश्चन", "simple" -> "सिंपल", "start" -> "स्टार्ट", "worst" -> "वर्स्ट", "year" -> "इयर", "best" -> "बेस्ट", "combination" -> "कॉम्बिनेशन", "design" -> "डिजाइन").
+3. Keep ONLY core technical acronyms, coding terms, technologies, and specific brand names in standard English letters (e.g., "API", "AWS", "React", "Node", "Docker", "database", "code", "Redis", "Kafka", "Next.js"). These should remain in English script.
+4. Replace all hyphens (-), em-dashes (—), and double dashes (--) with standard commas (,) or periods (.) to create natural pauses for the voice engine.
+5. Always ensure there is a single space after every punctuation mark (.,!?,). Do NOT use the Devanagari full stop (।).
 6. Under no circumstances should you add any explanation, notes, or introductory/trailing comments. You must output the final result wrapped in <result> and </result> tags.
-7. NEVER include words like "Note:", "Explanation:", "I have", or any conversational comments anywhere inside the <result> and </result> tags. The content inside the tags must ONLY be the translated speech text itself.
 
 Examples:
 Input: Hanji, main Hitesh Choudhary hoon. Main ek software engineer hoon aur ab full-time educator ban gaya hoon.
-Output: <result>हाँजी, मैं Hitesh Choudhary हूँ। मैं एक software engineer हूँ और ab full-time educator बन गया हूँ.</result>
+Output: <result>हाँजी, मैं Hitesh Choudhary हूँ. मैं एक सॉफ्टवेयर इंजीनियर हूँ और अब फुल-टाइम एजुकेटर बन गया हूँ.</result>
 
 Input: Perfect time to code then. Chai aur code, best combination hai.
-Output: <result>Perfect time to code then. चाय और code, best combination है.</result>
+Output: <result>परफेक्ट टाइम टू code करने का. चाय और code, बेस्ट कॉम्बिनेशन है.</result>
 
 Input: hello sir !! welcome nahi karoge
-Output: <result>hello sir !! welcome नहीं करोगे</result>
+Output: <result>हेलो सर! वेलकम नहीं करोगे?</result>
 
 Input: s bhai ne mujhe redis smjh liya, cache me reels save kr rha tha
-Output: <result>इस भाई ने मुझे redis समझ लिया, cache में reels save कर रहा था</result>
+Output: <result>इस भाई ने मुझे Redis समझ लिया, cache में reels save कर रहा था.</result>
 
 Input: Dekho, ye question bahut deep hai! Especially jab coding kar raha hota hoon.
-Output: <result>देखो, ye question बहुत deep है! Especially जब coding कर रहा होता हूँ.</result>`;
+Output: <result>देखो, यह क्वेश्चन बहुत डीप है! एस्पेशली जब coding कर रहा होता हूँ.</result>`;
 
       const { text: translatedText } = await generateText({
         model: translationModel,
