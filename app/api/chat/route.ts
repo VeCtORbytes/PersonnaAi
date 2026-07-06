@@ -68,6 +68,9 @@ export async function POST(req: NextRequest) {
           },
         });
 
+        // Eagerly trigger and await the response headers to catch connection/auth/rate-limit errors.
+        await result.response;
+
         // Attach model info in a custom header so the client can display it
         const response = result.toTextStreamResponse();
         const headers = new Headers(response.headers);
@@ -86,37 +89,25 @@ export async function POST(req: NextRequest) {
         });
       } catch (err) {
         lastError = err;
-
-        if (isRateLimitError(err)) {
-          console.warn(
-            `[/api/chat] Rate limit hit on model "${modelId}" — trying next fallback.`
-          );
-          // Immediately try the next model
-          continue;
-        }
-
-        // Non-rate-limit error: don't cascade, fail fast
-        console.error(`[/api/chat] Non-retryable error on model "${modelId}":`, err);
-        break;
+        console.warn(
+          `[/api/chat] Error hit on model "${modelId}" — trying next fallback. Error:`,
+          err instanceof Error ? err.message : err
+        );
+        // Automatically cascade to the next fallback for high-availability
+        continue;
       }
     }
 
-    // All models exhausted or non-retryable error hit
-    const allExhausted =
-      isRateLimitError(lastError) &&
-      FALLBACK_CHAIN.every((_, idx) => idx < FALLBACK_CHAIN.length);
-
+    // All models exhausted
     console.error("[/api/chat] All models failed. Last error:", lastError);
 
     return new Response(
       JSON.stringify({
-        error: allExhausted
-          ? "All AI models are currently rate-limited. Please try again in a minute."
-          : "An unexpected error occurred. Please try again.",
-        code: allExhausted ? "RATE_LIMIT_ALL" : "INTERNAL_ERROR",
+        error: "All AI models are currently rate-limited or unavailable. Please try again in a minute.",
+        code: "RATE_LIMIT_ALL",
       }),
       {
-        status: allExhausted ? 429 : 500,
+        status: 429,
         headers: { "Content-Type": "application/json" },
       }
     );

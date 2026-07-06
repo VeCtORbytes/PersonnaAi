@@ -67,22 +67,22 @@ Rules:
 1. Normalize texting shortcuts and casual typos into standard Hinglish spellings (e.g. "smjh" -> "samajh", "kr" -> "kar", "rha" -> "raha", "s" -> "is", "ne" -> "ne", "me" -> "me", "hu" -> "hoon").
 2. Keep English words exactly as they are written in the input text in English script (e.g., "redis", "cache", "save", "video", "youtube", "welcome").
 3. The output must be written 100% in English/Latin script. No Devanagari characters allowed.
-4. Do not add, remove, or modify the meaning of any words. Return ONLY the final normalized Hinglish text.
-5. If the text is already normalized, return it exactly as-is. Under no circumstances should you add any explanation, notes, or messages like "No changes are required".
-6. Keep all original punctuation (., !, ?, ,, -) exactly where they were. Do not drop or add symbols.
+4. Do not add, remove, or modify the meaning of any words.
+5. Keep all original punctuation (., !, ?, ,, -) exactly where they were. Do not drop or add symbols.
+6. Under no circumstances should you add any explanation, notes, or introductory/trailing comments. You must output the final result wrapped in <result> and </result> tags.
 
 Examples:
 Input: Perfect time to code then. Chai aur code — best combination hai.
-Output: Perfect time to code then. Chai aur code — best combination hai.
+Output: <result>Perfect time to code then. Chai aur code — best combination hai.</result>
 
 Input: hello sir !! welcome nahi karoge
-Output: hello sir !! welcome nahi karoge
+Output: <result>hello sir !! welcome nahi karoge</result>
 
 Input: s bhai ne mujhe redis smjh liya, cache me reels save kr rha tha
-Output: is bhai ne mujhe redis samajh liya, cache me reels save kar raha tha
+Output: <result>is bhai ne mujhe redis samajh liya, cache me reels save kar raha tha</result>
 
 Input: Mere liye chai ek comfort zone hai. Chai peeke code likhna mera favorite hai.
-Output: Mere liye chai ek comfort zone hai. Chai peeke code likhna mera favorite hai.`
+Output: <result>Mere liye chai ek comfort zone hai. Chai peeke code likhna mera favorite hai.</result>`
           : `You are a strict phonetic transliteration tool for Text-to-Speech.
 Your job is to convert Roman-script Hindi words (Hinglish) into native Devanagari script (Hindi characters), while preserving all English words exactly in English script.
 
@@ -92,23 +92,23 @@ Rules:
 3. Capitalized Hindi words at the start of a sentence (like 'Dekho', 'Hanji', 'Bhai', 'Acha', 'Maan', 'Keso') must be transliterated to Devanagari script. Do not leave them in English script just because they are capitalized.
 4. Do not add, remove, or modify any words. The output must have the exact same sequence of words, with Hindi words in Devanagari script and English words in English script.
 5. Use standard English punctuation (., !, ?, ,, -) in the output. Do NOT use the Devanagari full stop (।). Keep all original commas, hyphens, exclamation marks, and periods exactly where they were.
-6. Maintain the exact word-for-word sequence. Never add introductory comments, quotes, or notes.
+6. Under no circumstances should you add any explanation, notes, or introductory/trailing comments. You must output the final result wrapped in <result> and </result> tags.
 
 Examples:
 Input: Hanji, main Hitesh Choudhary hoon. Main ek software engineer hoon aur ab full-time educator ban gaya hoon.
-Output: हाँजी, मैं Hitesh Choudhary हूँ। मैं एक software engineer हूँ और अब full-time educator बन गया हूँ.
+Output: <result>हाँजी, मैं Hitesh Choudhary हूँ। मैं एक software engineer हूँ और ab full-time educator बन गया हूँ.</result>
 
 Input: Perfect time to code then. Chai aur code — best combination hai.
-Output: Perfect time to code then. चाय और code — best combination है.
+Output: <result>Perfect time to code then. चाय और code — best combination है.</result>
 
 Input: hello sir !! welcome nahi karoge
-Output: hello sir !! welcome नहीं करोगे
+Output: <result>hello sir !! welcome नहीं करोगे</result>
 
 Input: s bhai ne mujhe redis smjh liya, cache me reels save kr rha tha
-Output: इस भाई ने मुझे redis समझ लिया, cache में reels save कर रहा था
+Output: <result>इस भाई ने मुझे redis समझ लिया, cache में reels save कर रहा था</result>
 
 Input: Dekho, ye question bahut deep hai! Especially jab coding kar raha hota hoon.
-Output: देखो, ये question बहुत deep है! Especially जब coding कर रहा होता हूँ.`;
+Output: <result>देखो, ye question बहुत deep है! Especially जब coding कर रहा होता हूँ.</result>`;
 
       const { text: translatedText } = await generateText({
         model: translationModel,
@@ -118,10 +118,23 @@ Output: देखो, ये question बहुत deep है! Especially ज�
       });
 
       if (translatedText?.trim()) {
-        textToSynthesize = translatedText.trim();
-        console.log(
-          `[TTS Translation - ${scriptType}] Original: "${text}" -> Processed: "${textToSynthesize}"`
-        );
+        const match = translatedText.match(/<result>([\s\S]*?)<\/result>/i);
+        let extracted = match ? match[1].trim() : translatedText.trim();
+
+        if (!match) {
+          extracted = extracted
+            .split(/\r?\n/)
+            .filter(line => !/^\s*(note|explanation|here is|translation)\s*:/i.test(line))
+            .join("\n")
+            .trim();
+        }
+
+        if (extracted) {
+          textToSynthesize = extracted;
+          console.log(
+            `[TTS Translation - ${scriptType}] Original: "${text}" -> Processed: "${textToSynthesize}"`
+          );
+        }
       }
     } catch (transError) {
       console.error(

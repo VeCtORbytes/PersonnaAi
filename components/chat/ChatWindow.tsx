@@ -19,6 +19,7 @@ import Link from "next/link";
 import type { PersonaId } from "@/types";
 import { Logo } from "@/components/ui/Logo";
 import { Show, UserButton, useUser } from "@clerk/nextjs";
+import { motion } from "framer-motion";
 
 interface ChatWindowProps {
   initialPersona?: PersonaId;
@@ -111,7 +112,12 @@ export function ChatWindow({
       {debateMode ? (
         <DebateWindow onExit={() => setDebateMode(false)} />
       ) : (
-        <div className="flex h-screen bg-background overflow-hidden relative">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.25 }}
+          className="flex h-screen bg-background overflow-hidden relative w-full"
+        >
           {/* Honeycomb Pattern */}
           <HexagonPattern />
 
@@ -134,20 +140,20 @@ export function ChatWindow({
           <div className="flex flex-col flex-1 min-w-0 relative z-10 bg-background">
             {/* Header */}
             <header className="flex items-center justify-between px-4 py-2 border-b border-border pl-12 bg-background">
-              <Link href="/" className="flex items-center gap-2 group">
+              <Link href="/" className="flex items-center gap-2 group flex-shrink-0">
                 <Logo size={22} className="group-hover:rotate-6 transition-transform duration-300" />
-                <div className="flex flex-col">
+                <div className="flex flex-col hidden sm:flex">
                   <span className="text-sm font-extrabold tracking-tight text-foreground leading-none">
                     BrewedMinds
                   </span>
-                  <span className="text-[9px] text-muted-foreground hidden sm:inline-block leading-none mt-0.5">
+                  <span className="text-[9px] text-muted-foreground leading-none mt-0.5">
                     ChaiCode Cohort
                   </span>
                 </div>
               </Link>
 
               {/* Compact Persona Tab Selector in Header */}
-              <div className="flex-1 max-w-[200px] mx-4">
+              <div className="flex-1 max-w-[80px] sm:max-w-[200px] mx-2 sm:mx-4">
                 <PersonaSelector
                   active={activePersona}
                   onSwitch={switchPersona}
@@ -202,7 +208,7 @@ export function ChatWindow({
               · ChaiCode GenAI Cohort
             </footer>
           </div>
-        </div>
+        </motion.div>
       )}
     </>
   );

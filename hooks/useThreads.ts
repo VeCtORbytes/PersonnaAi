@@ -33,7 +33,14 @@ export function useThreads(initialPersona?: PersonaId, userName?: string) {
   const [activePersona, setActivePersona] = useState<PersonaId>(initialPersona ?? "hitesh");
   const [isLoading, setIsLoading] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Open sidebar on desktop on initial load
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth >= 768) {
+      setSidebarOpen(true);
+    }
+  }, []);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -94,6 +101,9 @@ export function useThreads(initialPersona?: PersonaId, userName?: string) {
       setThreads((prev) => [thread, ...prev]);
       setActiveThreadId(thread.id);
       setActivePersona(thread.personaId);
+      if (typeof window !== "undefined" && window.innerWidth < 768) {
+        setSidebarOpen(false);
+      }
       return thread;
     },
     [activePersona]
@@ -106,6 +116,9 @@ export function useThreads(initialPersona?: PersonaId, userName?: string) {
       return prev;
     });
     setActiveThreadId(threadId);
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
   }, []);
 
   const deleteThread = useCallback(
@@ -139,6 +152,9 @@ export function useThreads(initialPersona?: PersonaId, userName?: string) {
       );
       if (existing) {
         setActiveThreadId(existing.id);
+        if (typeof window !== "undefined" && window.innerWidth < 768) {
+          setSidebarOpen(false);
+        }
       } else {
         newThread(personaId);
       }

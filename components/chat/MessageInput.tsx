@@ -60,11 +60,7 @@ export function MessageInput({ onSend, disabled }: Props) {
           onKeyDown={handleKeyDown}
           onInput={handleInput}
           disabled={disabled}
-          placeholder={
-            disabled
-              ? "Generating..."
-              : `Ask a question... (Press ${shortcutText} for commands, Enter to send)`
-          }
+          placeholder={disabled ? "Generating..." : "Ask a question..."}
           rows={1}
           aria-label="Message input"
           className={cn(

@@ -149,9 +149,9 @@ export function LandingPage() {
             variants={itemVariants}
             className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl px-2 mt-4"
           >
-            <div
-              onClick={() => router.push("/chat?persona=hitesh")}
-              className="group relative cursor-pointer rounded-2xl border border-border bg-card p-8 flex flex-col items-center justify-between text-center transition-all duration-200 hover:border-[#D4A76A] shadow-xs overflow-hidden"
+            <Link
+              href="/chat?persona=hitesh"
+              className="group relative rounded-2xl border border-border bg-card p-8 flex flex-col items-center justify-between text-center transition-all duration-200 hover:border-[#D4A76A] shadow-xs overflow-hidden"
             >
               <div className="flex flex-col items-center space-y-4 w-full">
                 {/* Avatar with Flat Border */}
@@ -192,22 +192,22 @@ export function LandingPage() {
               </div>
 
               <div className="w-full mt-6">
-                <button className="w-full py-2.5 px-4 rounded-xl font-semibold text-sm bg-[#D4A76A] hover:bg-[#C4955A] text-black transition-colors flex items-center justify-center gap-2">
+                <div className="w-full py-2.5 px-4 rounded-xl font-semibold text-sm bg-[#D4A76A] hover:bg-[#C4955A] text-black transition-colors flex items-center justify-center gap-2">
                   Start Chat
                   <span className="group-hover:translate-x-1 transition-transform">→</span>
-                </button>
+                </div>
               </div>
-            </div>
+            </Link>
 
-            <div
-              onClick={() => router.push("/chat?persona=piyush")}
-              className="group relative cursor-pointer rounded-2xl border border-border bg-card p-8 flex flex-col items-center justify-between text-center transition-all duration-200 hover:border-[#7C3AED] shadow-xs overflow-hidden"
+            <Link
+              href="/chat?persona=piyush"
+              className="group relative rounded-2xl border border-border bg-card p-8 flex flex-col items-center justify-between text-center transition-all duration-200 hover:border-[#7C3AED] shadow-xs overflow-hidden"
             >
               <div className="flex flex-col items-center space-y-4 w-full">
                 {/* Avatar with Flat Border */}
                 <div className="relative w-28 h-28 rounded-full overflow-hidden border-3 border-border group-hover:border-[#7C3AED] transition-colors duration-200 flex items-center justify-center bg-zinc-900">
                   <Image
-                    src="/piyush sir.webp"
+                    src="/piyushsir.webp"
                     alt="Piyush Garg"
                     fill
                     sizes="(max-width: 112px) 100vw, 112px"
@@ -242,12 +242,12 @@ export function LandingPage() {
               </div>
 
               <div className="w-full mt-6">
-                <button className="w-full py-2.5 px-4 rounded-xl font-semibold text-sm bg-[#7C3AED] hover:bg-[#6D28D9] text-white transition-colors flex items-center justify-center gap-2">
+                <div className="w-full py-2.5 px-4 rounded-xl font-semibold text-sm bg-[#7C3AED] hover:bg-[#6D28D9] text-white transition-colors flex items-center justify-center gap-2">
                   Start Chat
                   <span className="group-hover:translate-x-1 transition-transform">→</span>
-                </button>
+                </div>
               </div>
-            </div>
+            </Link>
           </motion.div>
 
           {/* Quick Links / Feature Badges */}

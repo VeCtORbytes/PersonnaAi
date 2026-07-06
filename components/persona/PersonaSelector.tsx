@@ -45,7 +45,7 @@ export function PersonaSelector({ active, onSwitch, disabled }: Props) {
                 className="object-cover"
               />
             </div>
-            <span>{persona.id === "hitesh" ? "Hitesh" : "Piyush"}</span>
+            <span className="hidden sm:inline">{persona.id === "hitesh" ? "Hitesh" : "Piyush"}</span>
           </button>
         );
       })}

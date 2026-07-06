@@ -36,7 +36,7 @@ export function Sidebar({
         variant="ghost"
         size="icon"
         onClick={onToggle}
-        className="absolute left-2 top-3 z-20 h-8 w-8"
+        className="absolute left-2 top-3 z-40 h-8 w-8"
         aria-label={isOpen ? "Close sidebar" : "Open sidebar"}
       >
         {isOpen ? (
@@ -45,6 +45,14 @@ export function Sidebar({
           <PanelLeft className="h-4 w-4" />
         )}
       </Button>
+
+      {/* Mobile drawer backdrop */}
+      {isOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/40 backdrop-blur-xs z-20 cursor-pointer"
+          onClick={onToggle}
+        />
+      )}
 
       {/* Sidebar panel */}
       <AnimatePresence initial={false}>
@@ -56,8 +64,8 @@ export function Sidebar({
             exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.2, ease: "easeInOut" }}
             className={cn(
-              "flex flex-col border-r border-border bg-background overflow-hidden flex-shrink-0",
-              "h-full"
+              "flex flex-col border-r border-border bg-background overflow-hidden flex-shrink-0 h-full",
+              "z-30 md:relative absolute left-0 top-0 shadow-lg md:shadow-none"
             )}
           >
             {/* Sidebar header */}

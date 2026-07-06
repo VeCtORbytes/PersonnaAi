@@ -64,7 +64,7 @@ export function DebateWindow({ onExit }: Props) {
       {/* Split panels */}
       <div className="flex flex-1 gap-3 p-3 overflow-hidden">
         {/* Mobile: stacked. Desktop: side by side */}
-        <div className="flex flex-col sm:flex-row gap-3 w-full">
+        <div className="flex flex-col sm:flex-row gap-3 w-full flex-1 min-h-0">
           <DebatePanel
             persona="hitesh"
             messages={messages}
