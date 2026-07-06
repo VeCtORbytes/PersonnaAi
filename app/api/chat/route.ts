@@ -42,12 +42,17 @@ export async function POST(req: NextRequest) {
     const persona = getPersona(personaId);
     const firstName = userName?.split(" ")[0]?.trim() || undefined;
 
-    // Trim history to 2000 characters to keep context rich under the 12,000 TPM limit
-    const trimmedHistory = trimHistory(history ?? [], 2000);
-    // We use the streamlined mode (isFallback = true) to compress prompt size to ~2,500 tokens
-    const messages = buildPrompt(persona, trimmedHistory, message, firstName, true);
+    const isOpenAI = CHAT_MODEL.startsWith("gpt-") || CHAT_MODEL.startsWith("o1") || CHAT_MODEL.startsWith("o3");
 
-    console.log(`[/api/chat] Sending request to Groq model: ${CHAT_MODEL}`);
+    // For OpenAI we have high limits (200k TPM), so we can send the full prompt and history.
+    // For Groq we keep it tight to prevent rate limits.
+    const trimLimit = isOpenAI ? 8000 : 2000;
+    const isStreamlined = !isOpenAI;
+
+    const trimmedHistory = trimHistory(history ?? [], trimLimit);
+    const messages = buildPrompt(persona, trimmedHistory, message, firstName, isStreamlined);
+
+    console.log(`[/api/chat] Sending request to model: ${CHAT_MODEL}`);
 
     const result = streamText({
       model: getModel(CHAT_MODEL),
