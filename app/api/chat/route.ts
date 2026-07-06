@@ -38,23 +38,26 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Build context once — shared across all retry attempts
+    // Build context dynamically inside the fallback loop
     const persona = getPersona(personaId);
-    const trimmedHistory = trimHistory(history ?? [], 4000);
-    // Extract first name only for a natural feel (e.g. "Sarthak" from "Sarthak Gupta")
     const firstName = userName?.split(" ")[0]?.trim() || undefined;
-    const messages = buildPrompt(persona, trimmedHistory, message, firstName);
 
     // --- Model fallback loop ---
     let lastError: unknown = null;
 
     for (let i = 0; i < FALLBACK_CHAIN.length; i++) {
       const modelId = FALLBACK_CHAIN[i];
+      const isFallback = i > 0;
 
       try {
         console.log(
           `[/api/chat] Attempting model ${i + 1}/${FALLBACK_CHAIN.length}: ${modelId}`
         );
+
+        // Set tight limits for fallback models to fit safely under strict 6000 TPM quotas
+        const trimLimit = isFallback ? 1000 : 4000;
+        const trimmedHistory = trimHistory(history ?? [], trimLimit);
+        const messages = buildPrompt(persona, trimmedHistory, message, firstName, isFallback);
 
         const result = streamText({
           model: getModel(modelId),

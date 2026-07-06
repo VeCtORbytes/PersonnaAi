@@ -1,7 +1,7 @@
 import type { ModelMessage } from "ai";
 import type { Message, Persona } from "@/types";
 
-function buildSystemPrompt(persona: Persona, userName?: string): string {
+function buildSystemPrompt(persona: Persona, userName?: string, isFallback: boolean = false): string {
   const sections: string[] = [];
 
   // Core identity
@@ -143,8 +143,8 @@ The student you are talking to is named "${userName}".
     );
   }
 
-  // Few-shot examples
-  if (persona.examples?.length) {
+  // Few-shot examples - skipped for fallback models to fit in strict TPM quotas (e.g. 6000 TPM)
+  if (persona.examples?.length && !isFallback) {
     const exampleBlock = persona.examples
       .map(
         (e) =>
@@ -169,9 +169,10 @@ export function buildPrompt(
   persona: Persona,
   history: Message[],
   userMessage: string,
-  userName?: string
+  userName?: string,
+  isFallback: boolean = false
 ): ModelMessage[] {
-  const systemPrompt = buildSystemPrompt(persona, userName);
+  const systemPrompt = buildSystemPrompt(persona, userName, isFallback);
 
   const historyMessages: ModelMessage[] = history.map((msg) => ({
     role: msg.role,
