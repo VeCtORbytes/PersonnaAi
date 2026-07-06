@@ -4,6 +4,7 @@ import { groq } from "@/lib/ai/provider";
 import { synthesizeSpeech } from "@/lib/voice/provider";
 import { rateLimiter } from "@/lib/rateLimiter/provider";
 import { getPersona } from "@/data/personas/registry";
+import { preprocessPhoneticHinglish } from "@/utils/helpers";
 import type { PersonaId } from "@/types";
 
 export async function POST(req: NextRequest) {
@@ -70,6 +71,7 @@ Rules:
 4. Do not add, remove, or modify the meaning of any words.
 5. Keep all original punctuation (., !, ?, ,, -) exactly where they were. Do not drop or add symbols.
 6. Under no circumstances should you add any explanation, notes, or introductory/trailing comments. You must output the final result wrapped in <result> and </result> tags.
+7. NEVER include words like "Note:", "Explanation:", "I have", or any conversational comments anywhere inside the <result> and </result> tags. The content inside the tags must ONLY be the translated speech text itself.
 
 Examples:
 Input: Perfect time to code then. Chai aur code — best combination hai.
@@ -93,6 +95,7 @@ Rules:
 4. Do not add, remove, or modify any words. The output must have the exact same sequence of words, with Hindi words in Devanagari script and English words in English script.
 5. Use standard English punctuation (., !, ?, ,, -) in the output. Do NOT use the Devanagari full stop (।). Keep all original commas, hyphens, exclamation marks, and periods exactly where they were.
 6. Under no circumstances should you add any explanation, notes, or introductory/trailing comments. You must output the final result wrapped in <result> and </result> tags.
+7. NEVER include words like "Note:", "Explanation:", "I have", or any conversational comments anywhere inside the <result> and </result> tags. The content inside the tags must ONLY be the translated speech text itself.
 
 Examples:
 Input: Hanji, main Hitesh Choudhary hoon. Main ek software engineer hoon aur ab full-time educator ban gaya hoon.
@@ -121,6 +124,12 @@ Output: <result>देखो, ye question बहुत deep है! Especially �
         const match = translatedText.match(/<result>([\s\S]*?)<\/result>/i);
         let extracted = match ? match[1].trim() : translatedText.trim();
 
+        // Strip any LLM notes/explanations that may have leaked inside the result tags
+        extracted = extracted
+          .replace(/\s*\(?Note\s*:\s*[\s\S]*?\)?/gi, "")
+          .replace(/\s*\(?I have (transliterated|kept|translated)[\s\S]*?\)?/gi, "")
+          .trim();
+
         if (!match) {
           extracted = extracted
             .split(/\r?\n/)
@@ -143,9 +152,12 @@ Output: <result>देखो, ye question बहुत deep है! Especially �
       );
     }
 
+    // Preprocess Hinglish phonetically using dictionary helper to guarantee proper native accent
+    const processedText = preprocessPhoneticHinglish(textToSynthesize);
+
     // 5. Speech Synthesis
     const audioBuffer = await synthesizeSpeech({
-      text: textToSynthesize,
+      text: processedText,
       personaId,
     });
 

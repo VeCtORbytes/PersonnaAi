@@ -208,6 +208,10 @@ interface VoiceContextType {
   playbackState: PlaybackState;
   error: string | null;
   metrics: VoiceMetrics;
+  voiceSpeed: number;
+  setVoiceSpeed: (speed: number) => void;
+  voicePitch: "low" | "normal" | "high";
+  setVoicePitch: (pitch: "low" | "normal" | "high") => void;
   play: (messageId: string, text: string, personaId: PersonaId) => Promise<void>;
   pause: () => void;
   resume: () => void;
@@ -227,6 +231,8 @@ export function VoiceProvider({
   const [activeMessageId, setActiveMessageId] = useState<string | null>(null);
   const [playbackState, setPlaybackState] = useState<PlaybackState>("idle");
   const [error, setError] = useState<string | null>(null);
+  const [voiceSpeed, setVoiceSpeed] = useState<number>(1.0);
+  const [voicePitch, setVoicePitch] = useState<"low" | "normal" | "high">("normal");
 
   // Expose metrics via state to resolve hooks/ref access compiler rule
   const [metrics, setMetrics] = useState<VoiceMetrics>({
@@ -451,7 +457,9 @@ export function VoiceProvider({
               signal
             );
           }
-        }
+        },
+        voiceSpeed,
+        voicePitch
       );
     }
   };
@@ -568,6 +576,10 @@ export function VoiceProvider({
         playbackState,
         error,
         metrics,
+        voiceSpeed,
+        setVoiceSpeed,
+        voicePitch,
+        setVoicePitch,
         play,
         pause,
         resume,

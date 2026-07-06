@@ -5,12 +5,35 @@ export class AudioPlayer {
   private analyserNode: AnalyserNode | null = null;
   private sourceNode: MediaElementAudioSourceNode | null = null;
 
-  play(blob: Blob, onEnded: () => void, onError: (error: string) => void) {
+  play(
+    blob: Blob,
+    onEnded: () => void,
+    onError: (error: string) => void,
+    speed: number = 1.0,
+    pitch: "low" | "normal" | "high" = "normal"
+  ) {
     this.stop();
 
     this.currentObjectUrl = URL.createObjectURL(blob);
     const audio = new Audio(this.currentObjectUrl);
     this.audio = audio;
+
+    // Apply speed and pitch adjustments client-side
+    let rate = speed;
+    let preserves = true;
+    if (pitch === "low") {
+      rate = speed * 0.88;
+      preserves = false;
+    } else if (pitch === "high") {
+      rate = speed * 1.12;
+      preserves = false;
+    }
+
+    audio.defaultPlaybackRate = rate;
+    audio.playbackRate = rate;
+    if ("preservesPitch" in audio) {
+      (audio as any).preservesPitch = preserves;
+    }
 
     // Wire up Web Audio API for waveform
     try {

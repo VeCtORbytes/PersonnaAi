@@ -12,7 +12,7 @@ import { DebateWindow } from "@/components/debate/DebateWindow";
 import { DebateModeToggle } from "@/components/debate/DebateModeToggle";
 import { Sidebar } from "@/components/sidebar/Sidebar";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Trash2, Sliders } from "lucide-react";
 import { CommandPalette } from "@/components/ui/CommandPalette";
 import { HexagonPattern } from "@/components/ui/HexagonPattern";
 import Link from "next/link";
@@ -20,6 +20,7 @@ import type { PersonaId } from "@/types";
 import { Logo } from "@/components/ui/Logo";
 import { Show, UserButton, useUser } from "@clerk/nextjs";
 import { motion } from "framer-motion";
+import { useVoice } from "@/context/VoiceContext";
 
 interface ChatWindowProps {
   initialPersona?: PersonaId;
@@ -34,6 +35,8 @@ export function ChatWindow({
 }: ChatWindowProps) {
   const [debateMode, setDebateMode] = useState(initialDebateMode);
   const [shortcutText, setShortcutText] = useState("⌘K");
+  const [showVoiceSettings, setShowVoiceSettings] = useState(false);
+  const { voiceSpeed, setVoiceSpeed, voicePitch, setVoicePitch } = useVoice();
 
   useEffect(() => {
     if (
@@ -166,7 +169,57 @@ export function ChatWindow({
                   {shortcutText}
                 </kbd>
                 <DebateModeToggle onClick={() => setDebateMode(true)} />
-                <ThemeToggle />
+                 <ThemeToggle />
+                
+                {/* Voice Settings Dropdown */}
+                <div className="relative">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setShowVoiceSettings(!showVoiceSettings)}
+                    aria-label="Voice settings"
+                    title="Voice settings"
+                    className="h-8 w-8 rounded-lg"
+                  >
+                    <Sliders className="h-4 w-4 text-foreground" />
+                  </Button>
+                  {showVoiceSettings && (
+                    <div className="absolute right-0 mt-2 w-48 rounded-xl border border-border bg-popover p-3 shadow-lg z-50 text-popover-foreground">
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">
+                            Voice Speed
+                          </label>
+                          <select
+                            value={voiceSpeed}
+                            onChange={(e) => setVoiceSpeed(parseFloat(e.target.value))}
+                            className="w-full text-xs bg-muted border border-border rounded-md px-2 py-1 focus:outline-none"
+                          >
+                            <option value="0.75">0.75x (Slow)</option>
+                            <option value="1.0">1.0x (Normal)</option>
+                            <option value="1.25">1.25x (Fast)</option>
+                            <option value="1.5">1.5x (Super Fast)</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">
+                            Voice Pitch
+                          </label>
+                          <select
+                            value={voicePitch}
+                            onChange={(e) => setVoicePitch(e.target.value as any)}
+                            className="w-full text-xs bg-muted border border-border rounded-md px-2 py-1 focus:outline-none"
+                          >
+                            <option value="low">Low Tone</option>
+                            <option value="normal">Normal Tone</option>
+                            <option value="high">High Tone</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 <Show when="signed-in">
                   <UserButton />
                 </Show>
