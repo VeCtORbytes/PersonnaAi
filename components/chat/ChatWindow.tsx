@@ -18,7 +18,7 @@ import { HexagonPattern } from "@/components/ui/HexagonPattern";
 import Link from "next/link";
 import type { PersonaId } from "@/types";
 import { Logo } from "@/components/ui/Logo";
-import { Show, UserButton, useUser } from "@clerk/nextjs";
+import { Show, UserButton, useUser, SignInButton } from "@clerk/nextjs";
 import { motion } from "framer-motion";
 import { useVoice } from "@/context/VoiceContext";
 
@@ -208,6 +208,16 @@ export function ChatWindow({
 
                 <Show when="signed-in">
                   <UserButton />
+                </Show>
+                <Show when="signed-out">
+                  <SignInButton mode="redirect" fallbackRedirectUrl="/chat">
+                    <Button
+                      variant="outline"
+                      className="h-8 text-xs font-semibold border-border hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors rounded-lg px-3"
+                    >
+                      Sign In
+                    </Button>
+                  </SignInButton>
                 </Show>
                 <Button
                   variant="ghost"
