@@ -1,14 +1,15 @@
 import { SignUp } from "@clerk/nextjs";
+import { AuthLayout } from "@/components/auth/AuthLayout";
 
 export default function SignUpPage() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
+    <AuthLayout subtitle="Create your BrewedMinds account to start chatting">
       <SignUp
         routing="path"
         path="/sign-up"
         signInUrl="/sign-in"
         fallbackRedirectUrl="/chat"
       />
-    </div>
+    </AuthLayout>
   );
 }
