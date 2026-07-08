@@ -38,6 +38,7 @@ export function useThreads(initialPersona?: PersonaId, userName?: string) {
   // Open sidebar on desktop on initial load
   useEffect(() => {
     if (typeof window !== "undefined" && window.innerWidth >= 768) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSidebarOpen(true);
     }
   }, []);
@@ -208,7 +209,14 @@ export function useThreads(initialPersona?: PersonaId, userName?: string) {
           }),
         });
 
-        if (!response.ok) throw new Error("Request failed");
+        if (!response.ok) {
+          let errorText = "Request failed";
+          try {
+            const errData = await response.json();
+            if (errData.error) errorText = errData.error;
+          } catch {}
+          throw new Error(errorText);
+        }
         if (!response.body) throw new Error("No response body");
 
         const reader = response.body.getReader();
@@ -245,10 +253,11 @@ export function useThreads(initialPersona?: PersonaId, userName?: string) {
         }
       } catch (err) {
         console.error("sendMessage error:", err);
+        const errorText = err instanceof Error ? err.message : "Something went wrong. Please try again.";
         const errorMessage: Message = {
           id: generateId(),
           role: "assistant",
-          content: "Something went wrong. Please try again.",
+          content: errorText,
           timestamp: new Date(),
         };
         updateThread(activeThreadId, (t) => ({

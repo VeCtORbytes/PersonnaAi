@@ -33,7 +33,7 @@ export class AudioPlayer {
       audio.defaultPlaybackRate = rate;
       audio.playbackRate = rate;
       if ("preservesPitch" in audio) {
-        (audio as any).preservesPitch = preserves;
+        (audio as HTMLAudioElement & { preservesPitch: boolean }).preservesPitch = preserves;
       }
     };
 

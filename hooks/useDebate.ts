@@ -24,29 +24,45 @@ export function useDebate() {
     message: string,
     history: Message[],
     onChunk: (chunk: string) => void,
-    onDone: (full: string) => void
+    onDone: (full: string) => void,
+    onError: (errMessage: string) => void
   ) => {
-    const response = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message, personaId: persona, history }),
-    });
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message, personaId: persona, history }),
+      });
 
-    if (!response.ok || !response.body) throw new Error(`${persona} stream failed`);
+      if (!response.ok) {
+        let errorText = `${persona} stream failed`;
+        try {
+          const errData = await response.json();
+          if (errData.error) errorText = errData.error;
+        } catch {}
+        throw new Error(errorText);
+      }
 
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let full = "";
+      if (!response.body) throw new Error("No response body");
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      const chunk = decoder.decode(value, { stream: true });
-      full += chunk;
-      onChunk(full);
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let full = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        full += chunk;
+        onChunk(full);
+      }
+
+      onDone(full);
+    } catch (err) {
+      console.error(`streamPersona error for ${persona}:`, err);
+      const errorText = err instanceof Error ? err.message : `${persona} stream failed`;
+      onError(errorText);
     }
-
-    onDone(full);
   };
 
   const sendMessage = useCallback(
@@ -120,6 +136,11 @@ export function useDebate() {
             hiteshFull = full;
             hiteshDone = true;
             checkBothDone();
+          },
+          (errText) => {
+            hiteshFull = errText;
+            hiteshDone = true;
+            checkBothDone();
           }
         ),
         streamPersona(
@@ -129,6 +150,11 @@ export function useDebate() {
           (chunk) => setStreamingPiyush(chunk),
           (full) => {
             piyushFull = full;
+            piyushDone = true;
+            checkBothDone();
+          },
+          (errText) => {
+            piyushFull = errText;
             piyushDone = true;
             checkBothDone();
           }

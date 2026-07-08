@@ -29,6 +29,7 @@ export function LandingPage() {
       typeof window !== "undefined" &&
       !/Mac|iPad|iPhone|iPod/.test(navigator.userAgent)
     ) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShortcutText("Ctrl+K");
     }
   }, []);
@@ -138,7 +139,7 @@ export function LandingPage() {
               .
             </h1>
             <p className="text-base sm:text-lg text-muted-foreground">
-              AI-powered conversations with India's top tech educators.
+              AI-powered conversations with India&apos;s top tech educators.
               <br />
               <span className="italic text-muted-foreground/80">Not a chatbot — a mentor.</span>
             </p>

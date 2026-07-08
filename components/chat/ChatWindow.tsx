@@ -43,6 +43,7 @@ export function ChatWindow({
       typeof window !== "undefined" &&
       !/Mac|iPad|iPhone|iPod/.test(navigator.userAgent)
     ) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShortcutText("Ctrl+K");
     }
   }, []);

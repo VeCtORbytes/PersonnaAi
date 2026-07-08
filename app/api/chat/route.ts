@@ -9,12 +9,22 @@ import {
   CHAT_MODEL,
   getModel,
 } from "@/lib/ai/provider";
+import { auth } from "@clerk/nextjs/server";
+import { chatRateLimiter } from "@/lib/rateLimiter/provider";
 
 export const runtime = "edge";
 
 export async function POST(req: NextRequest) {
   let personaId: PersonaId = "hitesh";
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     const body = await req.json();
     const { message, personaId: parsedPersonaId, history, userName } = body as {
       message: string;
@@ -37,6 +47,34 @@ export async function POST(req: NextRequest) {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
+    }
+
+    // Rate limiting check
+    const limitResult = await chatRateLimiter.check(userId);
+    const limitHeaders = {
+      "X-RateLimit-Limit": limitResult.limit.toString(),
+      "X-RateLimit-Remaining": limitResult.remaining.toString(),
+      "X-RateLimit-Reset": limitResult.reset.toString(),
+    };
+
+    if (!limitResult.allowed) {
+      const customMessage = personaId === "hitesh"
+        ? "Lala is busy scaling systems right now! Please try again in a few seconds. 🍵"
+        : "Server is heavy, mat kar lala, mat kar! 😂 Try again in a minute. 💻";
+
+      return new Response(
+        JSON.stringify({
+          error: customMessage,
+          code: "RATE_LIMIT_ALL",
+        }),
+        {
+          status: 429,
+          headers: {
+            "Content-Type": "application/json",
+            ...limitHeaders,
+          },
+        }
+      );
     }
 
     const persona = getPersona(personaId);
@@ -71,21 +109,27 @@ export async function POST(req: NextRequest) {
     const response = result.toTextStreamResponse();
     const headers = new Headers(response.headers);
     headers.set("X-Model-Used", CHAT_MODEL);
+    headers.set("X-RateLimit-Limit", limitResult.limit.toString());
+    headers.set("X-RateLimit-Remaining", limitResult.remaining.toString());
+    headers.set("X-RateLimit-Reset", limitResult.reset.toString());
 
     return new Response(response.body, {
       status: response.status,
       headers,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[/api/chat] Error:", error);
+
+    const err = error as Record<string, unknown> | null;
+    const errMessage = String(err?.message ?? "");
 
     // Identify rate limit errors (Status 429, limit exceeded, etc.)
     const isRateLimit =
-      error?.status === 429 ||
-      error?.statusCode === 429 ||
-      String(error?.message ?? "").toLowerCase().includes("rate limit") ||
-      String(error?.message ?? "").toLowerCase().includes("limit exceeded") ||
-      String(error?.message ?? "").toLowerCase().includes("tpm");
+      err?.status === 429 ||
+      err?.statusCode === 429 ||
+      errMessage.toLowerCase().includes("rate limit") ||
+      errMessage.toLowerCase().includes("limit exceeded") ||
+      errMessage.toLowerCase().includes("tpm");
 
     const customMessage = personaId === "hitesh"
       ? "Lala is busy scaling systems right now! Please try again in a few seconds. 🍵"
